@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { collection, addDoc } from "firebase/firestore"; 
+import { getFirestore , collection, addDoc } from "firebase/firestore"; 
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -18,3 +18,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+async function addPinpoint(x, y){
+    try {
+        const test = await addDoc(collection(db, "posts"), {
+            xCoordinate: x,
+            yCoordinate: y,
+        });
+        console.log("Document written with ID: ", test.id);
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    }
+}
+export {addPinpoint};
+//addData();

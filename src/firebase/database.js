@@ -16,4 +16,3 @@ async function addPinpoint(x, y){
     }
 }
 export {addPinpoint};
-//addData();

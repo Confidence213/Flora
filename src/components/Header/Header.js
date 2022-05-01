@@ -1,25 +1,28 @@
 import React from 'react';
+import './Header.css'
 
 function Header () {
     let username = "foo";
-    let signedIn = false;
+    let signedIn = true;
     return (
         <div>
             <h2><a href="example.com/home">FloraFauna</a></h2>
             {signedIn ?
-                <div>
-                    "Hello " {username}
-                    <a href="example.com/profile">Profile</a>
-                    <a href="example.com/newpost">New Post</a>
-                    <a href="example.com/logout">Log Out</a>
-                </div>
+                <table><tr>
+                    <th>Hello,  {username}</th>
+                    <th><a href="example.com/profile">Profile</a></th>
+                    <th><a href="example.com/newpost">New Post</a></th>
+                    <th><a href="example.com/logout">Log Out</a></th>
+                </tr></table>
             : 
-                <div>
-                    "Not logged in"
-                    <a href="example.com/signin">New Post</a>
-                    <a href="example.com/signin">Sign In</a>
-                </div>
+                <table><tr>
+                    <th>Not logged in</th>
+                    <th><a href="example.com/signin">New Post</a></th>
+                    <th><a href="example.com/signin">Sign In</a></th>
+                </tr></table>
             }
         </div>
     )
 }
+
+export default Header;

@@ -7,7 +7,7 @@ function App() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // User Login info
+  // Dummy User Login info
   const database = [
     {
       username: "user1",
@@ -24,7 +24,7 @@ function App() {
     pass: "invalid password"
   };
 
-  const handleSubmit = (event) => {
+  const handleLoginSubmit = (event) => {
     //Prevent page reload
     event.preventDefault();
 
@@ -47,6 +47,12 @@ function App() {
     }
   };
 
+  const handleSignUpSubmit = (event) => {
+    //Prevent page reload
+    event.preventDefault();
+    setIsSubmitted(true);
+  }
+
   // Generate JSX code for error message
   const renderErrorMessage = (name) =>
     name === errorMessages.name && (
@@ -54,9 +60,29 @@ function App() {
     );
 
   // JSX code for login form
-  const renderForm = (
+  const renderLoginForm = (
     <div className="form">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLoginSubmit}>
+        <div className="input-container">
+          <label>Username </label>
+          <input type="text" name="uname" required />
+          {renderErrorMessage("uname")}
+        </div>
+        <div className="input-container">
+          <label>Password </label>
+          <input type="password" name="pass" required />
+          {renderErrorMessage("pass")}
+        </div>
+        <div className="button-container">
+          <input type="submit" />
+        </div>
+      </form>
+    </div>
+  );
+
+  const renderSignUpForm = (
+    <div className="form">
+      <form onSubmit={handleSignUpSubmit}>
         <div className="input-container">
           <label>Username </label>
           <input type="text" name="uname" required />
@@ -79,9 +105,9 @@ function App() {
       <div className="login-form">
       <h2>FloraFauna</h2>
         <div className="title">Login</div>
-        {isSubmitted ? <div>User successfully logged in</div> : renderForm}
+        {isSubmitted ? <div>User successfully logged in</div> : renderLoginForm}
         <div className="title">Sign Up</div>
-        {isSubmitted ? <div>User successfully logged in</div> : renderForm}
+        {isSubmitted ? <div>User successfully signed up</div> : renderSignUpForm}
       </div>
     </div>
   );

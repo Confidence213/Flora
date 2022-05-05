@@ -77,7 +77,10 @@ function App() {
   return (
     <div className="app">
       <div className="login-form">
-        <div className="title">Sign In</div>
+      <h2>FloraFauna</h2>
+        <div className="title">Login</div>
+        {isSubmitted ? <div>User successfully logged in</div> : renderForm}
+        <div className="title">Sign Up</div>
         {isSubmitted ? <div>User successfully logged in</div> : renderForm}
       </div>
     </div>

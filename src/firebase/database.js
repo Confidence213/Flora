@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore , collection, setDoc, doc } from "firebase/firestore"; 
+import { getFirestore , collection, setDoc, doc, getDoc } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL  } from "firebase/storage";
 
 const storage = getStorage(app);
@@ -7,7 +7,7 @@ const db = getFirestore(app);
 
 //NOTE: image field should be a File or Blob object when inserting data into database, but should be a URL when getting data.
 class Post{
-    constructor(author, title, description, species, image, latitude, longitude, rating=0){
+    constructor(author, title, description, species, image, latitude, longitude, rating=0, id=-1){
         this.author = author;
         this.title = title;
         this.description = description;
@@ -16,6 +16,7 @@ class Post{
         this.latitude = latitude;
         this.longitude = longitude;
         this.rating = rating;
+        this.id = id;
     }
 }
 
@@ -34,7 +35,7 @@ const postConverter = {
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        return new Post(data.author, data.title, data.description, data.species, data.image, data.latitude, data.longitude, data.rating);
+        return new Post(data.author, data.title, data.description, data.species, data.image, data.latitude, data.longitude, data.rating, snapshot.id);
     }
 };
 
@@ -43,9 +44,7 @@ async function addNewPost(post){
 
     let imagePath = 'images/' + newPostRef.id;
     const storageRef = ref(storage, imagePath);
-    await uploadBytes(storageRef, post.image).then((snapshot) => {
-        console.log('Uploaded a blob or file!');
-    });
+    await uploadBytes(storageRef, post.image);
 
     let imageURL = "";
     await getDownloadURL(ref(storage, imagePath))
@@ -57,4 +56,10 @@ async function addNewPost(post){
     setDoc(newPostRef,post);
 }
 
-export {Post, addNewPost};
+async function getPostById(id){
+    const ref = doc(db, "posts", id).withConverter(postConverter);
+    const docSnap = await getDoc(ref);
+    return docSnap.data();
+}
+
+export {Post, addNewPost, getPostById};

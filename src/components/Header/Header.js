@@ -1,24 +1,25 @@
 import React from 'react';
+import { Link } from 'react-router-dom'
 import './Header.css'
 
 function Header () {
     let username = "foo";
     let signedIn = true;
     return (
-        <div>
-            <h2><a href="example.com/home">FloraFauna</a></h2>
+        <div class="header-center">
+            <h2><Link class="header-link" to="/">FloraFauna</Link></h2>
             {signedIn ?
-                <table><tr>
-                    <th>Hello,  {username}</th>
-                    <th><a href="example.com/profile">Profile</a></th>
-                    <th><a href="example.com/newpost">New Post</a></th>
-                    <th><a href="example.com/logout">Log Out</a></th>
+                <table class="header-table"><tr>
+                    <th>Hello, {username}</th>
+                    <th><Link class="header-link" to="/profile/me">Profile</Link></th>
+                    <th><Link class="header-link" to="/upload">New Post</Link></th>
+                    <th><a class="header-link" href="example.com/logout">Log Out</a></th>
                 </tr></table>
             : 
-                <table><tr>
+                <table class="header-table"><tr>
                     <th>Not logged in</th>
-                    <th><a href="example.com/signin">New Post</a></th>
-                    <th><a href="example.com/signin">Sign In</a></th>
+                    <th><Link class="header-link" to="/login">New Post</Link></th>
+                    <th><Link class="header-link" to="/login">Sign In</Link></th>
                 </tr></table>
             }
         </div>

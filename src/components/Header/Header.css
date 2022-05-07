@@ -1,13 +1,13 @@
-body {
+.header-center {
     text-align: center;
 }
 
-a:link {
+.header-link:link, .header-link:visited {
     text-decoration: none;
     color: green;
 }
 
-table {
+.header-table {
     border: 1px solid black;
     margin-left: auto;
     margin-right: auto;

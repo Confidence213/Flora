@@ -1,5 +1,7 @@
 import './App.css';
 import Header from './components/Header/Header'
+import Home from './pages/Home/Home'
+import Upload from './pages/Upload/Upload'
 import NotFound from './pages/NotFound/NotFound';
 import { Routes, Route } from 'react-router-dom'
 
@@ -13,13 +15,13 @@ function App() {
     <div className="App">
       <Header />  
       <Routes>
-        // change the components, of course
-        <Route exact path='/' element={<NotFound url='homepage'/>} />
+        //change the components, of course
+        <Route index element={<Home />} />
         <Route path='/login' element={<NotFound url='login'/>} />
         <Route path='/map' element={<NotFound url='map'/>} />
         <Route path='/post/:postid' element={<NotFound url='post' />} />
         <Route path='/profile/:userid' element={<NotFound url='profile'/>} />
-        <Route path='/upload' element={<NotFound url='upload'/>} />
+        <Route path='/upload' element={<Upload url='upload'/>} />
     </Routes>
     </div>
   );

@@ -10,7 +10,7 @@ function Header () {
             <h2><Link class="header-link" to="/">FloraFauna</Link></h2>
             {signedIn ?
                 <table class="header-table"><tr>
-                    <th>Hello, {username}</th>
+                    <th><Link class="header-link" to="/">Hello, {username}</Link></th>
                     <th><Link class="header-link" to="/profile/me">Profile</Link></th>
                     <th><Link class="header-link" to="/upload">New Post</Link></th>
                     <th><a class="header-link" href="example.com/logout">Log Out</a></th>

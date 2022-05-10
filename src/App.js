@@ -3,6 +3,7 @@ import Header from './components/Header/Header'
 import Home from './pages/Home/Home'
 import Upload from './pages/Upload/Upload'
 import NotFound from './pages/NotFound/NotFound';
+import Post from './pages/Post/Post'
 import { Routes, Route } from 'react-router-dom'
 
         /* use id parameter as such
@@ -19,7 +20,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path='/login' element={<NotFound url='login'/>} />
         <Route path='/map' element={<NotFound url='map'/>} />
-        <Route path='/post/:postid' element={<NotFound url='post' />} />
+        <Route path='/post/:postid' element={<Post />} />
         <Route path='/profile/:userid' element={<NotFound url='profile'/>} />
         <Route path='/upload' element={<Upload url='upload'/>} />
     </Routes>

@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, collection, setDoc, doc, getDoc, getDocs } from "firebase/firestore"; 
+import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const storage = getStorage(app);
@@ -64,7 +64,7 @@ async function getPostById(id){
 
 //Returns a map of id (string) -> Post objects
 async function getAllPosts(){
-    const ref = collection(db, "posts").withConverter(postConverter)
+    const ref = collection(db, "posts").withConverter(postConverter);
     const querySnapshot = await getDocs(ref);
     let map = new Map();
     querySnapshot.forEach((doc) => {
@@ -73,4 +73,15 @@ async function getAllPosts(){
     return map;
 }
 
-export {Post, addNewPost, getPostById, getAllPosts};
+async function getPostsBySpecies(species){
+    const ref = collection(db, "posts").withConverter(postConverter);
+    const q = query(ref, where("species", "==", species));
+    const querySnapshot = await getDocs(q);
+    let map = new Map();
+    querySnapshot.forEach((doc) => {
+        map.set(doc.id, doc.data());
+    });
+    return map;
+}
+
+export {Post, addNewPost, getPostById, getAllPosts, getPostsBySpecies};

@@ -84,4 +84,32 @@ async function getPostsBySpecies(species){
     return map;
 }
 
-export {Post, addNewPost, getPostById, getAllPosts, getPostsBySpecies};
+async function getPostsByLocation(longMax, longMin, latMax, latMin){
+    const ref = collection(db, "posts").withConverter(postConverter);
+    const q = query(ref, where("longitude", "<=", longMax), where("longitude", ">=", longMin));
+    const querySnapshot = await getDocs(q);
+    let map = new Map();
+    querySnapshot.forEach((doc) => {
+        let currentLatitude = doc.data().latitude;
+        if(currentLatitude <= latMax && currentLatitude >= latMin){
+            map.set(doc.id, doc.data());
+        }
+    });
+    return map;
+}
+
+async function getPostsBySpeciesAndLocation(species, longMax, longMin, latMax, latMin){
+    const ref = collection(db, "posts").withConverter(postConverter);
+    const q = query(ref, where("species", "==", species), where("longitude", "<=", longMax), where("longitude", ">=", longMin));
+    const querySnapshot = await getDocs(q);
+    let map = new Map();
+    querySnapshot.forEach((doc) => {
+        let currentLatitude = doc.data().latitude;
+        if(currentLatitude <= latMax && currentLatitude >= latMin){
+            map.set(doc.id, doc.data());
+        }
+    });
+    return map;
+}
+
+export {Post, addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation};

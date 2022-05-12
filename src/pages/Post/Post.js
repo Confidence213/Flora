@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom'
+import SpeciesID from '../../components/SpeciesID/SpeciesID';
 import NotFound from '../NotFound/NotFound';
 import './Post.css'
 
@@ -23,8 +24,8 @@ function Post () {
         <p></p>
         <table class="post-top-table">
             <tr>
-                <td class="post-top-td"><img id="post-image" src="https://i.imgur.com/3tO1svX.jpeg" /></td>
-                <td class="post-top-td">bar (species identification frame go here)</td>
+                <td class="post-top-td"><img id="post-image" src="https://i.imgur.com/1cbbKOF.jpeg" /></td>
+                <td class="post-top-td"><SpeciesID postid={postid} /></td>
             </tr>
         </table>
         <p></p>

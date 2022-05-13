@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where } from "firebase/firestore"; 
+import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const storage = getStorage(app);
@@ -155,4 +155,36 @@ async function getCommentsByPost(postId){
     return map;
 }
 
-export {Post, Comment, addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, addCommentToPost, getCommentsByPost};
+async function incrementPostRating(postId){
+    //TODO: Check if user has already liked/disliked post
+    const ref = doc(collection(db, 'posts'), postId);
+    updateDoc(ref,{
+        rating: increment(1)
+    });
+}
+
+async function decrementPostRating(postId){
+    //TODO: Check if user has already liked/disliked post
+    const ref = doc(collection(db, 'posts'), postId);
+    updateDoc(ref,{
+        rating: increment(-1)
+    });
+}
+
+async function incrementCommentRating(postId, commentId){
+    //TODO: Check if user has already liked/disliked post
+    const ref = doc(collection(db, "comments/" + postId + "/comments"), commentId);
+    updateDoc(ref,{
+        rating: increment(1)
+    });
+}
+
+async function decrementCommentRating(postId, commentId){
+    //TODO: Check if user has already liked/disliked post
+    const ref = doc(collection(db, "comments/" + postId + "/comments"), commentId);
+    updateDoc(ref,{
+        rating: increment(-1)
+    });
+}
+
+export {Post, Comment, addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, addCommentToPost, getCommentsByPost, incrementPostRating, decrementPostRating, incrementCommentRating, decrementCommentRating};

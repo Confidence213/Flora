@@ -20,6 +20,16 @@ class Post{
     }
 }
 
+class Comment{
+    constructor(text, author, date, rating=0, id=-1){
+        this.text = text;
+        this.author=author;
+        this.rating=rating;
+        this.date = date;
+        this.id = id;
+    }
+}
+
 const postConverter = {
     toFirestore: (post) => {
         return {
@@ -39,6 +49,21 @@ const postConverter = {
     }
 };
 
+const commentConverter ={
+    toFirestore: (comment) => {
+        return {
+            text: comment.text,
+            author: comment.author,
+            rating: comment.rating,
+            date: comment.date
+        };
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return new Comment(data.text, data.author, data.date, data.rating, snapshot.id);
+    }
+}
+
 async function addNewPost(post){
     const newPostRef = doc(collection(db, "posts")).withConverter(postConverter);
 
@@ -53,7 +78,12 @@ async function addNewPost(post){
     });
     
     post.image = imageURL;
-    setDoc(newPostRef,post);
+    await setDoc(newPostRef,post);
+}
+
+async function addCommentToPost(comment, postId){
+    const ref = doc(collection(db, 'comments/' + postId + '/comments')).withConverter(commentConverter);
+    await setDoc(ref, comment);
 }
 
 async function getPostById(id){
@@ -112,4 +142,14 @@ async function getPostsBySpeciesAndLocation(species, longMax, longMin, latMax, l
     return map;
 }
 
-export {Post, addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation};
+async function getCommentsByPost(postId){
+    const ref = collection(db, "comments/" + postId + "/comments").withConverter(commentConverter);
+    const querySnapshot = await getDocs(ref);
+    let map = new Map();
+    querySnapshot.forEach((doc) => {
+        map.set(doc.id, doc.data());
+    });
+    return map;
+}
+
+export {Post, Comment, addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, addCommentToPost, getCommentsByPost};

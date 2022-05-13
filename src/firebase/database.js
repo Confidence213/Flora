@@ -7,7 +7,7 @@ const db = getFirestore(app);
 
 //NOTE: image field should be a File or Blob object when inserting data into database, but should be a URL when getting data.
 class Post{
-    constructor(author, title, description, species, image, latitude, longitude, rating=0, id=-1){
+    constructor(author, title, description, species, image, latitude, longitude, date, rating=0, id=-1){
         this.author = author;
         this.title = title;
         this.description = description;
@@ -15,6 +15,7 @@ class Post{
         this.image = image;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.date = date;
         this.rating = rating;
         this.id = id;
     }
@@ -40,12 +41,13 @@ const postConverter = {
                 image: post.image,
                 latitude: post.latitude,
                 longitude: post.longitude,
+                date: post.date,
                 rating: post.rating,
             };
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        return new Post(data.author, data.title, data.description, data.species, data.image, data.latitude, data.longitude, data.rating, snapshot.id);
+        return new Post(data.author, data.title, data.description, data.species, data.image, data.latitude, data.longitude, data.date, data.rating, snapshot.id);
     }
 };
 
@@ -142,6 +144,7 @@ async function getPostsBySpeciesAndLocation(species, longMax, longMin, latMax, l
     return map;
 }
 
+//Warning: Does not check if document with id postId exists
 async function getCommentsByPost(postId){
     const ref = collection(db, "comments/" + postId + "/comments").withConverter(commentConverter);
     const querySnapshot = await getDocs(ref);

@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc } from "firebase/firestore"; 
+import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const storage = getStorage(app);
@@ -97,7 +97,8 @@ async function getPostById(id){
 //Returns a map of id (string) -> Post objects
 async function getAllPosts(){
     const ref = collection(db, "posts").withConverter(postConverter);
-    const querySnapshot = await getDocs(ref);
+    const q = query(ref, orderBy("rating","desc"));
+    const querySnapshot = await getDocs(q);
     let map = new Map();
     querySnapshot.forEach((doc) => {
         map.set(doc.id, doc.data());
@@ -107,7 +108,7 @@ async function getAllPosts(){
 
 async function getPostsBySpecies(species){
     const ref = collection(db, "posts").withConverter(postConverter);
-    const q = query(ref, where("species", "==", species));
+    const q = query(ref, where("species", "==", species), orderBy("rating","desc"));
     const querySnapshot = await getDocs(q);
     let map = new Map();
     querySnapshot.forEach((doc) => {
@@ -120,13 +121,17 @@ async function getPostsByLocation(longMax, longMin, latMax, latMin){
     const ref = collection(db, "posts").withConverter(postConverter);
     const q = query(ref, where("longitude", "<=", longMax), where("longitude", ">=", longMin));
     const querySnapshot = await getDocs(q);
-    let map = new Map();
+
+    let arr = [];
     querySnapshot.forEach((doc) => {
         let currentLatitude = doc.data().latitude;
         if(currentLatitude <= latMax && currentLatitude >= latMin){
-            map.set(doc.id, doc.data());
+            arr.push(doc.data());
         }
     });
+
+    arr.sort((a,b) => b.rating - a.rating);
+    let map = new Map(arr.map(post => [post.id, post]));
     return map;
 }
 
@@ -134,20 +139,24 @@ async function getPostsBySpeciesAndLocation(species, longMax, longMin, latMax, l
     const ref = collection(db, "posts").withConverter(postConverter);
     const q = query(ref, where("species", "==", species), where("longitude", "<=", longMax), where("longitude", ">=", longMin));
     const querySnapshot = await getDocs(q);
-    let map = new Map();
+
+    let arr = [];
     querySnapshot.forEach((doc) => {
         let currentLatitude = doc.data().latitude;
         if(currentLatitude <= latMax && currentLatitude >= latMin){
-            map.set(doc.id, doc.data());
+            arr.push(doc.data());
         }
     });
+    arr.sort((a,b) => b.rating - a.rating);
+    let map = new Map(arr.map(post => [post.id, post]));
     return map;
 }
 
 //Warning: Does not check if document with id postId exists
 async function getCommentsByPost(postId){
     const ref = collection(db, "comments/" + postId + "/comments").withConverter(commentConverter);
-    const querySnapshot = await getDocs(ref);
+    const q = query(ref, orderBy("rating","desc"));
+    const querySnapshot = await getDocs(q);
     let map = new Map();
     querySnapshot.forEach((doc) => {
         map.set(doc.id, doc.data());

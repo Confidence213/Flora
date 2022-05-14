@@ -31,6 +31,13 @@ class Comment{
     }
 }
 
+class SpeciesIdentification extends Comment{
+    constructor(species, text, author, date, rating=0, id=-1){
+        super(text, author, date, rating, id);
+        this.species=species;
+    }
+}
+
 const postConverter = {
     toFirestore: (post) => {
         return {
@@ -66,6 +73,22 @@ const commentConverter ={
     }
 }
 
+const speciesIdentificationConverter ={
+    toFirestore: (speciesIdentification) => {
+        return {
+            species: speciesIdentification.species,
+            text: speciesIdentification.text,
+            author: speciesIdentification.author,
+            rating: speciesIdentification.rating,
+            date: speciesIdentification.date
+        };
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return new SpeciesIdentification(data.species, data.text, data.author, data.date, data.rating, snapshot.id);
+    }
+}
+
 async function addNewPost(post){
     const newPostRef = doc(collection(db, "posts")).withConverter(postConverter);
 
@@ -86,6 +109,11 @@ async function addNewPost(post){
 async function addCommentToPost(comment, postId){
     const ref = doc(collection(db, 'comments/' + postId + '/comments')).withConverter(commentConverter);
     await setDoc(ref, comment);
+}
+
+async function addSpeciesIdentification(speciesIdentification, postId){
+    const ref = doc(collection(db, 'species_identification/' + postId + '/comments')).withConverter(speciesIdentificationConverter);
+    await setDoc(ref, speciesIdentification);
 }
 
 async function getPostById(id){
@@ -164,6 +192,17 @@ async function getCommentsByPost(postId){
     return map;
 }
 
+async function getSpeciesIdentificationByPost(postId){
+    const ref = collection(db, "species_identification/" + postId + "/comments").withConverter(speciesIdentificationConverter);
+    const q = query(ref, orderBy("rating","desc"));
+    const querySnapshot = await getDocs(q);
+    let map = new Map();
+    querySnapshot.forEach((doc) => {
+        map.set(doc.id, doc.data());
+    });
+    return map;
+}
+
 async function incrementPostRating(postId){
     //TODO: Check if user has already liked/disliked post
     const ref = doc(collection(db, 'posts'), postId);
@@ -196,4 +235,22 @@ async function decrementCommentRating(postId, commentId){
     });
 }
 
-export {Post, Comment, addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, addCommentToPost, getCommentsByPost, incrementPostRating, decrementPostRating, incrementCommentRating, decrementCommentRating};
+async function incrementSpeciesIdentificationRating(postId, speciesIdentificationId){
+    //TODO: Check if user has already liked/disliked post
+    const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
+    updateDoc(ref,{
+        rating: increment(1)
+    });
+}
+
+async function decrementSpeciesIdentificationRating(postId, speciesIdentificationId){
+    //TODO: Check if user has already liked/disliked post
+    const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
+    updateDoc(ref,{
+        rating: increment(-1)
+    });
+}
+
+
+export {Post, Comment, SpeciesIdentification, addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, addCommentToPost, getCommentsByPost, incrementPostRating, decrementPostRating, incrementCommentRating, decrementCommentRating};
+export {addSpeciesIdentification, getSpeciesIdentificationByPost, incrementSpeciesIdentificationRating, decrementSpeciesIdentificationRating};

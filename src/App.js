@@ -5,6 +5,8 @@ import Upload from './pages/Upload/Upload'
 import NotFound from './pages/NotFound/NotFound';
 import Login from './pages/Login/Login'
 import { Routes, Route } from 'react-router-dom'
+import Map from './pages/Map/Map'
+import {makeUser, signIn, signOutUser, getUsername} from './firebase/account'
 
         /* use id parameter as such
         function Profile(props) {
@@ -12,6 +14,8 @@ import { Routes, Route } from 'react-router-dom'
           just google react-router useParams
           */
 function App() {
+  let foo = signIn("foo@example.com", "wrong");
+  console.log(foo)
   return (
     <div className="App">
       <Header />  

@@ -1,0 +1,31 @@
+table.page {
+    display: block;
+    margin: 0 3%;
+}
+
+#speciesError{
+    color: red;
+}
+
+#locationError{
+    color: red;
+}
+
+#imageError{
+    color: red;
+}
+
+
+div.image_input {
+    width: 50%;
+    float:left;
+}
+
+div.other_input {
+    width: 50%;
+    float:right;
+}
+
+#image {
+    max-width: 80%;
+}

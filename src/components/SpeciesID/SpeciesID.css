@@ -1,0 +1,30 @@
+#speciesid-highlight {
+    background-color: yellow;
+}
+
+#speciesid-list {
+    height: 25vw;
+    overflow-y: auto
+}
+
+.speciesid-element {
+    padding-bottom: 10px;
+}
+
+.speciesid-species {
+    font-size: 18px;
+}
+
+.speciesid-user {
+    font-size: 12px;
+}
+
+#speciesid-textbox {
+    padding-top: 1vw;
+    padding-bottom: 1vw;
+    width: 80%;
+}
+
+#speciesid-formpad {
+    padding-right: 7px;
+}

@@ -4,6 +4,7 @@ import Home from './pages/Home/Home'
 import Upload from './pages/Upload/Upload'
 import NotFound from './pages/NotFound/NotFound';
 import Login from './pages/Login/Login'
+import Post from './pages/Post/Post'
 import { Routes, Route } from 'react-router-dom'
 import Map from './pages/Map/Map'
 import {makeUser, signIn, signOutUser, getUsername} from './firebase/account'
@@ -14,8 +15,6 @@ import {makeUser, signIn, signOutUser, getUsername} from './firebase/account'
           just google react-router useParams
           */
 function App() {
-  let foo = signIn("foo@example.com", "wrong");
-  console.log(foo)
   return (
     <div className="App">
       <Header />  
@@ -24,7 +23,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/map' element={<NotFound url='map'/>} />
-        <Route path='/post/:postid' element={<NotFound url='post' />} />
+        <Route path='/post/:postid' element={<Post />} />
         <Route path='/profile/:userid' element={<NotFound url='profile'/>} />
         <Route path='/upload' element={<Upload url='upload'/>} />
     </Routes>

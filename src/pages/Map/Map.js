@@ -27,8 +27,12 @@ function Map () {
       </span>
       : null 
     }
+<<<<<<< HEAD
       <MapFrame setBounds={setBounds} points={points} defaultCenter={defaultCenter} 
         small={false} defaultZoom={9} />
+=======
+      <MapFrame setBounds={setBounds} points={points} defaultCenter={defaultCenter}/>
+>>>>>>> origin/MakeMap
     </div>
   ); 
 }

@@ -19,9 +19,9 @@ function MapFrame (props) {
     
     return (
         <MapContainer
-          className="leaflet-container"
+          id={props.small ? "leaflet-container-small": "leaflet-container-large"}
           center={props.defaultCenter}
-          zoom={9}
+          zoom={props.defaultZoom}
           maxZoom={18}
         >
           <TileLayer

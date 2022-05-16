@@ -1,4 +1,9 @@
-.leaflet-container {
+#leaflet-container-large {
     height: 80vh;
     width: 80vw;
+  }
+
+  #leaflet-container-small {
+    height: 60vh;
+    width: 40vw;
   }

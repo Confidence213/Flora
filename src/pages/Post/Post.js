@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom'
+import MapFrame from '../../components/MapFrame/MapFrame';
 import SpeciesID from '../../components/SpeciesID/SpeciesID';
 import NotFound from '../NotFound/NotFound';
 import './Post.css'
@@ -32,7 +33,15 @@ function Post () {
         <table class="post-bottom-table">
             <tr>
                 <td class="post-bottom-td">Comment frame go here</td>
-                <td class="post-bottom-td"><img class="post-map-container" src="https://i.imgur.com/SLWHOjq.png" /></td>
+                <td class="post-bottom-td"><MapFrame class="post-map-container" 
+                    setBounds={(n) => {}}
+                    points={[{
+                        position: [34.073, -118.451],
+                        message: <div><p>Bird seen 5:55 AM</p><a href="https://example.com">View Post</a></div>
+                      }]}
+                    defaultCenter={[34.072830, -118.451346]} defaultZoom={[11]}
+                    small={true} 
+                    /></td>
             </tr>
         </table>
       </div>  

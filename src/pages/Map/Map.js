@@ -27,7 +27,8 @@ function Map () {
       </span>
       : null 
     }
-      <MapFrame setBounds={setBounds} points={points} defaultCenter={defaultCenter}/>
+      <MapFrame setBounds={setBounds} points={points} defaultCenter={defaultCenter} 
+        small={false} defaultZoom={9} />
     </div>
   ); 
 }

@@ -3,11 +3,9 @@ import { useAuthState } from "react-firebase-hooks/auth";
 
 import {
     getAuth,
-    EmailAuthCredential,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    currentUser,
 } from "firebase/auth"
 import { getFirestore , collection, addDoc } from "firebase/firestore"; 
 
@@ -33,7 +31,7 @@ export async function makeUser(username, email, password) {
 
 export async function signIn (email, password) {
     try {
-        await signInWithEmailAndPassword(email, password);
+        await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
         console.error(err);
         alert(err.message);
@@ -41,9 +39,22 @@ export async function signIn (email, password) {
 }
 
 export async function getUsername() {
-    return auth.currentUser.displayName;
+  const isLoggedIn = await userLoggedIn();
+  if(isLoggedIn)
+    return auth.currentUser.email;
+  else
+    return null;
 }
+
 
 export async function signOutUser() {
     signOut()
+}
+
+export const userLoggedIn = () => {
+  return new Promise((resolve, reject) => {
+    auth.onAuthStateChanged(user => {
+      resolve(!!user);
+    })
+  });
 }

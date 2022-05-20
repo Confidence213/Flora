@@ -10,7 +10,6 @@ function MapDependent(props) {
     const map = useMapEvents({
         move: () => {
             props.setBounds(map.getBounds());
-            console.log(map.getCenter())
         },
     });
     return (null);

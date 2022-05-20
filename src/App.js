@@ -22,7 +22,9 @@ function App() {
         //change the components, of course
         <Route index element={<Home />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/map' element={<Map />} />
+        <Route path='/map/:lat/:lng/:zm' element={<Map />} />
+        <Route path='/map/:lat/:lng/:zm/:spc' element={<Map />} />
+        <Route path='/map/' element={<Map />} />
         <Route path='/post/:postid' element={<Post />} />
         <Route path='/profile/:userid' element={<NotFound url='profile'/>} />
         <Route path='/upload' element={<Upload url='upload'/>} />

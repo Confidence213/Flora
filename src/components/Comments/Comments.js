@@ -2,24 +2,24 @@ import React from 'react';
 import { Link } from 'react-router-dom'
 import './Comments.css'
 
-
+let comments = [
+    { 
+         text: "i love this picture",
+         user: "foo",
+         time: <unix timestamp></unix>
+     },
+    { 
+         text: "mee too",
+         user: "bar",
+         time: <unix timestamp></unix>
+     },
+]
 
 class Comments extends React.Component {
     constructor(props) {
       super(props);
       this.state = {comment: '', isSubmitted: false};
-      let comments = [
-        { 
-             text: "i love this picture",
-             user: "foo",
-             time: <unix timestamp></unix>
-         },
-        { 
-             text: "mee too",
-             user: "bar",
-             time: <unix timestamp></unix>
-         },
-    ]
+      
   
   
       this.handleChange = this.handleChange.bind(this);

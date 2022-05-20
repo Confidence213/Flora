@@ -1,29 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Map.css'
+import { getPostsByLocation } from '../../firebase/database';
 import MapFrame from '../../components/MapFrame/MapFrame';
 
 function Map () {
   let defaultCenter = [34.072830, -118.451346]
   const [bounds, setBounds] = useState(null);
-  const [points, setPoints] = useState([{
-      position: [34.073, -118.451],
-      message: <div><p>Bird seen 5:55 AM</p><a href="https://example.com">View Post</a></div>
+  const [points, setPoints] = useState([]);
+
+
+
+  const [list, setList] = useState(null);
+  
+  async function getList() {
+      const m_list = await getPostsByLocation(debouncedBounds?._northEast.lng, 
+        debouncedBounds?._southWest.lng, debouncedBounds?._northEast.lat, debouncedBounds?._southWest.lat);
+      //(longMax, longMin, latMax, latMin) = northeast lng, southwest lng, northeast lat, southwest lat
+      console.log(
+        "searching between " + debouncedBounds?._northEast.lng +
+        debouncedBounds?._southWest.lng + debouncedBounds?._northEast.lat + debouncedBounds?._southWest.lat
+      )
+      console.log(Array.from(m_list.values()));
+      if(m_list === undefined) {
+          setList(null);
+      }
+      else {
+        setList(Array.from(m_list.values()));
+        setPoints(Array.from(m_list.values()).map((info) => ({
+          position: [info.longitude, info.latitude],
+          message: <div><p>{info.species} seen {info.date}</p><a href={"/post/" + info.id}>View Post</a></div>
+        })));
+      }
+  }
+
+  const debouncedBounds = useDebounce(bounds, 2000);
+  useEffect(
+    () => {
+      getList();
     },
-    {
-      position: [34.173, -118.551],
-      message: <div><p>Squirell seen 6:55 AM</p><a href="https://example.com">View Post</a></div>
-    },
-  ]);
+    [debouncedBounds] 
+  );
+
+  // debounce custom hook
+  function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(
+      () => {
+        const handler = setTimeout(() => {
+          setDebouncedValue(value);
+        }, delay);
+        return () => {
+          clearTimeout(handler);
+        };
+      },
+      [value, delay] 
+    );
+
+    return debouncedValue;
+  }
+
 
 
   return (
     <div>
     {bounds ? 
     <span>
-      <p>Southwest lng: {bounds._southWest.lat} </p>
-      <p>Southwest lat: {bounds._southWest.lng} </p>
-      <p>Northeast lng: {bounds._northEast.lat} </p>
-      <p>Northeast lat: {bounds._northEast.lng} </p> 
+      <p>Southwest lng: {debouncedBounds?._southWest.lng} </p>
+      <p>Southwest lat: {debouncedBounds?._southWest.lat} </p>
+      <p>Northeast lng: {debouncedBounds?._northEast.lng} </p>
+      <p>Northeast lat: {debouncedBounds?._northEast.lat} </p>
       </span>
       : null 
     }

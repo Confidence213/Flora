@@ -1,10 +1,22 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom'
 import './Header.css'
-
+import {userLoggedIn, getUsername} from "../../firebase/account"
 function Header () {
-    let username = "foo";
-    let signedIn = true;
+    const [username, setUsername] = useState(null);
+    const [signedIn, setIsLoggedIn] = useState(null);
+
+    async function getUserInfo(){
+        const m_username = await getUsername();
+        const m_signedIn = await userLoggedIn();
+
+        setUsername(m_username);
+        setIsLoggedIn(m_signedIn);
+    }
+    useEffect(() => {
+        getUserInfo();
+      }, []);
+    
     return (
         <div class="header-center">
             <h2><Link class="header-link" to="/">FloraFauna</Link></h2>

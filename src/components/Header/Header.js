@@ -30,8 +30,7 @@ function Header () {
             : 
                 <table class="header-table"><tr>
                     <th>Not logged in</th>
-                    <th><Link class="header-link" to="/login">New Post</Link></th>
-                    <th><Link class="header-link" to="/login">Sign In</Link></th>
+                    <th><Link class="header-link" to="/login">Login / Signup</Link></th>
                 </tr></table>
             }
             <p></p>

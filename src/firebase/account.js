@@ -24,18 +24,20 @@ export async function makeUser(username, email, password) {
           email,
         });
       } catch (err) {
-        console.error(err);
         alert(err.message);
+        return false;
       }
+    return true;
 }
 
 export async function signIn (email, password) {
     try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
-        console.error(err);
-        alert(err.message);
+        alert("Wrong email or password");
+        return false;
       }
+    return true;
 }
 
 export async function getUsername() {

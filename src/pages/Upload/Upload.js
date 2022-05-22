@@ -8,13 +8,14 @@ import {getUsername} from "../../firebase/account"
 class UploadPage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {species: '', lat: '', long: '', image: null, imageFile: null, showSpecies: false, showLocation: false, showImage: false, map: null};
+    this.state = {loaded: false, species: '', lat: '', long: '', image: null, imageFile: null, showSpecies: false, showLocation: false, showImage: false, map: null};
 
     this.handleChange1 = this.handleChange1.bind(this);
     this.handleChange2 = this.handleChange2.bind(this);
     this.handleChange3 = this.handleChange3.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleImage = this.handleImage.bind(this);
+    this.handleLocation = this.handleLocation.bind(this);
 
   }
 
@@ -22,6 +23,29 @@ class UploadPage extends React.Component {
   async handleChange2(event) {    this.setState({lat: event.target.value});  }
   async handleChange3(event) {    this.setState({long: event.target.value});  }
 
+  latRef = React.createRef();
+  longRef = React.createRef();
+
+  componentDidMount(){
+    this.setState({loaded: true });
+  }
+
+  async handleLocation() {
+    if (this.state.loaded)
+    { 
+      if (!"geolocation" in navigator) {
+        alert("error: geological data not available")
+      }
+      else {
+        navigator.geolocation.getCurrentPosition( (position) => {    
+          this.setState({lat: position.coords.latitude });
+          this.setState({long: position.coords.longitude });
+          this.latRef.current.value = position.coords.latitude;
+          this.longRef.current.value = position.coords.longitude;
+        });
+      }
+    }
+  }
 
   async handleSubmit(event) {
 
@@ -106,12 +130,13 @@ class UploadPage extends React.Component {
           <input type="text" onChange={this.handleChange1}/>
           {this.state.showSpecies && <p id='speciesError'>Please enter Species</p>}
           <h3>Lat and Long: </h3>
-          <input type="text" onChange={this.handleChange2}/>
+          <input type="text" ref={this.latRef} onChange={this.handleChange2} />
 
-          <input type="text" onChange={this.handleChange3}/>
+          <input type="text" ref={this.longRef} onChange={this.handleChange3}/>
           {this.state.showLocation && <p id='locationError'>Please enter Location</p>}
           <h3></h3>
           <h2></h2>
+          <button onClick={this.handleLocation} className="post">Get Current Location</button>
           <button onClick={this.handleSubmit} className="post">POST</button>
         </div>
       </tc>

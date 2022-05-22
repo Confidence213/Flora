@@ -23,20 +23,16 @@ decrementCommentRating} from '../../firebase/database';
 ]*/}
 const [list, setList] = useState(null);
 
-    async function getList() {
-        const m_list = await getCommentsByPost(props.postid);
-        console.log(Array.from(m_list.values()));
-        if(m_list === undefined) {
-            setList(null);
-        }
-        else {
-            setList(Array.from(m_list.values()));
-        }
+    
+
+      const m_list = await getCommentsByPost(props.postid);
+      if(m_list === undefined) {
+        setList(null);
+    }
+    else {
+        setList(Array.from(m_list.values()));
     }
 
-    useEffect(() => {
-        getList();
-      }, []);
 
 
 //let commentsArr = Array.from(comments.keys())

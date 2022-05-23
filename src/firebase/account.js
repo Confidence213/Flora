@@ -7,7 +7,7 @@ import {
     signOut,
     updateProfile,
 } from "firebase/auth"
-import { getFirestore , doc, setDoc } from "firebase/firestore"; 
+import { getFirestore , doc, setDoc, query, collection, where, getDocs} from "firebase/firestore"; 
 
 const db = getFirestore(app);
 
@@ -15,10 +15,22 @@ const auth = getAuth(app);
 
 export async function makeUser(username, email, password) {
     try {
+
+        const repeatUsernameCheck = collection(db, "users");
+        const q = query(repeatUsernameCheck, where("username", "==", username));
+        const querySnapshot = await getDocs(q);
+        var usernameIsTaken = false;
+        querySnapshot.forEach((doc) => {
+          alert("Username already taken");
+          usernameIsTaken = true;
+        });
+        if(usernameIsTaken){return false;}
+
         const res = await createUserWithEmailAndPassword(auth, email, password);
         const ref = doc(db, "users", res.user.uid);
         await setDoc(ref, {
-          username: username
+          username: username,
+          isModerator: false
         });
         await updateProfile(auth.currentUser, {
           displayName: username,

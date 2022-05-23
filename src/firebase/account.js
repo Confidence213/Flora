@@ -56,6 +56,14 @@ export async function signOutUser() {
     await signOut();
 }
 
+export async function getUserId(){
+  const isLoggedIn = await userLoggedIn();
+  if(isLoggedIn)
+    return auth.currentUser.uid;
+  else
+    return null;
+}
+
 export const userLoggedIn = () => {
   return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(user => {

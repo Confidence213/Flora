@@ -1,13 +1,13 @@
 import app from "./firebaseSetup.js"
-import { useAuthState } from "react-firebase-hooks/auth";
 
 import {
     getAuth,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
+    updateProfile,
 } from "firebase/auth"
-import { getFirestore , collection, addDoc } from "firebase/firestore"; 
+import { getFirestore , doc, setDoc } from "firebase/firestore"; 
 
 const db = getFirestore(app);
 
@@ -16,12 +16,12 @@ const auth = getAuth(app);
 export async function makeUser(username, email, password) {
     try {
         const res = await createUserWithEmailAndPassword(auth, email, password);
-        const user = res.user;
-        await addDoc(collection(db, "users"), {
-          uid: user.uid,
-          username,
-          authProvider: "local",
-          email,
+        const ref = doc(db, "users", res.user.uid);
+        await setDoc(ref, {
+          username: username
+        });
+        await updateProfile(auth.currentUser, {
+          displayName: username
         });
       } catch (err) {
         alert(err.message);
@@ -43,7 +43,7 @@ export async function signIn (email, password) {
 export async function getUsername() {
   const isLoggedIn = await userLoggedIn();
   if(isLoggedIn)
-    return auth.currentUser.email;
+    return auth.currentUser.displayName;
   else
     return null;
 }

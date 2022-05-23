@@ -21,7 +21,10 @@ export async function makeUser(username, email, password) {
           username: username
         });
         await updateProfile(auth.currentUser, {
-          displayName: username
+          displayName: username,
+          totalpostrating: 0,
+          totalcommentrating: 0,
+          totalspeciesidentificationrating: 0,
         });
       } catch (err) {
         alert(err.message);
@@ -34,7 +37,7 @@ export async function signIn (email, password) {
     try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
-        alert("Wrong email or password");
+        alert("Wrong email and/or password");
         return false;
       }
     return true;
@@ -50,7 +53,7 @@ export async function getUsername() {
 
 
 export async function signOutUser() {
-    signOut()
+    await signOut();
 }
 
 export const userLoggedIn = () => {

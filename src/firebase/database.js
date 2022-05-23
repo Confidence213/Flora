@@ -109,7 +109,6 @@ async function addNewPost(post){
     const userRef = doc(db, "users", userid);
     await updateDoc(userRef,{
         totalposts: increment(1),
-        posts: arrayUnion(newPostRef.id),
     });
 
     return true;
@@ -118,11 +117,23 @@ async function addNewPost(post){
 async function addCommentToPost(comment, postId){
     const ref = doc(collection(db, 'comments/' + postId + '/comments')).withConverter(commentConverter);
     await setDoc(ref, comment);
+
+    let userid = await getUserId();
+    const userRef = doc(db, "users", userid);
+    await updateDoc(userRef,{
+        totalcomments: increment(1),
+    });
 }
 
 async function addSpeciesIdentification(speciesIdentification, postId){
     const ref = doc(collection(db, 'species_identification/' + postId + '/comments')).withConverter(speciesIdentificationConverter);
     await setDoc(ref, speciesIdentification);
+
+    let userid = await getUserId();
+    const userRef = doc(db, "users", userid);
+    await updateDoc(userRef,{
+        totalspeciesidentifications: increment(1),
+    });
 }
 
 async function getPostById(id){

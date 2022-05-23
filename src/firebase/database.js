@@ -1,7 +1,7 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy } from "firebase/firestore"; 
+import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy, arrayUnion} from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
+import {getUserId} from "./account.js"
 const storage = getStorage(app);
 const db = getFirestore(app);
 
@@ -104,6 +104,13 @@ async function addNewPost(post){
     
     post.image = imageURL;
     await setDoc(newPostRef,post);
+
+    let userid = await getUserId();
+    const userRef = doc(db, "users", userid);
+    await updateDoc(userRef,{
+        totalposts: increment(1),
+        posts: arrayUnion(newPostRef.id),
+    });
 
     return true;
 }

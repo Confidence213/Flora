@@ -22,9 +22,6 @@ export async function makeUser(username, email, password) {
         });
         await updateProfile(auth.currentUser, {
           displayName: username,
-          totalpostrating: 0,
-          totalcommentrating: 0,
-          totalspeciesidentificationrating: 0,
         });
       } catch (err) {
         alert(err.message);

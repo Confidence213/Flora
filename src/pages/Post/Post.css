@@ -1,0 +1,65 @@
+.post-overall {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+#post-title {
+    display: inline;
+}
+
+#post-postvote {
+    display:inline;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+#post-postnum {
+    font-size: 20px;
+    padding-right: 20px;
+    color: grey;
+    display: inline;
+}
+
+#post-postname {
+    font-size: 30px;
+    padding-right: 20px;
+    color: green;
+    display: inline;
+}
+
+#post-posttime {
+    font-size: 20px;
+    color: grey;
+    display: inline;
+}
+
+#post-image {
+    width: 30vw;
+    height: 30vw;
+    object-fit: cover;
+    
+}
+
+.post-top-td:nth-child(1) {
+    width: 40vw;
+    text-align: center;
+}
+
+.post-top-td:nth-child(2) {
+    width: 60vw;
+}
+
+.post-map-container {
+    width: 35vw;
+    height: 60vw;
+}
+
+.post-bottom-td:nth-child(1) {
+    width: 60vw;
+    
+}
+
+.post-bottom-td:nth-child(2) {
+    width: 40vw;
+    text-align: center;
+}

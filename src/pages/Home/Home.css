@@ -1,0 +1,37 @@
+div.page {
+  background-color: #E5E5E5;
+  margin: 0 3%;
+  text-align: center;
+}
+
+.inputs {
+  width: 50%;
+  border: 1px solid black;
+  float: left;
+  padding: 2%;
+  border-spacing: 10px;
+}
+
+#map {
+  width: 50%;
+  float:right;
+}
+
+#locinput{
+  width: 70%;
+}
+#minput{
+  width: 15%;
+}
+
+#spinput{
+  width: 87%;
+}
+
+
+
+@media only screen and (max-width: 600px) {
+  div.page {
+    background-color: white;
+  }
+}

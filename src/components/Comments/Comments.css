@@ -1,0 +1,25 @@
+.title {
+    font-size: 25px;
+    margin-bottom: 20px;
+  }
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 30px;
+  }
+
+  .comment-input[type="submit"]:hover {
+    background: #6cf0c2;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .error {
+    color: red;
+    font-size: 12px;
+  }

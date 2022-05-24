@@ -1,11 +1,13 @@
 import './Login.css';
 import React, { useState } from "react";
+import {signIn, makeUser} from "../../firebase/account"
 
 class Login extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {lemail: '', lpassword: '', susername: '', 
-    spassword: '', semail: '', isSubmitted: false};
+    spassword: '', semail: ''};
 
 
     this.handleChange = this.handleChange.bind(this);
@@ -18,17 +20,20 @@ class Login extends React.Component {
     this.setState({[name]: event.target.value});
   }
 
-  handleLoginSubmit(event) {
-    this.setState({isSubmitted: true});
-    alert('An email was submitted: ' + this.state.lemail + " and a password: " + this.state.lpassword);
+  async handleLoginSubmit(event) {
     event.preventDefault();
+    if(await signIn(this.state.lemail, this.state.lpassword)){
+      alert("Successfully logged in!");
+      window.location = "/";
+    }
   }
 
-  handleSignUpSubmit(event) {
-    this.setState({isSubmitted: true});
-    alert('A name was submitted: ' + this.state.susername + " and a password: " + this.state.spassword
-    + " and email: " + this.state.semail);
+  async handleSignUpSubmit(event) {
     event.preventDefault();
+    if(await makeUser(this.state.susername, this.state.semail, this.state.spassword)){
+      alert("Account successfuly made!");
+      window.location = "/";
+    }
   }
 
   render() {
@@ -38,7 +43,6 @@ class Login extends React.Component {
           <table class="login-table"><tr>
             <td>
               <div className="title" style={{textAlign: "center"}}>Login</div>
-              {this.state.isSubmitted ? <div>User successfully logged in</div> : 
               <div className="form">
               <form onSubmit={this.handleLoginSubmit}>
                 <div className="input-container">
@@ -58,11 +62,9 @@ class Login extends React.Component {
                 </div>
               </form>
             </div>
-              }
             </td>
             <td>
               <div className="title" style={{textAlign: "center"}}>Sign Up</div>
-              {this.state.isSubmitted ? <div>User successfully signed up</div> : 
               <div className="form">
               <form onSubmit={this.handleSignUpSubmit}>
                 <div className="input-container">
@@ -88,7 +90,6 @@ class Login extends React.Component {
                 </div>
               </form>
             </div>
-              }
             </td>
           </tr></table>
         </div>
@@ -96,6 +97,4 @@ class Login extends React.Component {
     );
   }
 }
-
-
 export default Login;

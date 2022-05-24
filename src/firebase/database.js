@@ -104,6 +104,8 @@ async function addNewPost(post){
     
     post.image = imageURL;
     await setDoc(newPostRef,post);
+
+    return true;
 }
 
 async function addCommentToPost(comment, postId){

@@ -239,7 +239,7 @@ async function incrementPostRating(postId, postAuthor){
     else{
         currentUserVotedPosts.set(postId, true);
         let userid = await getUserId();
-        const userRef = doc(db, "users", userid);
+        const userRef = doc(db, "users_likes", userid);
         let path = 'votedposts.' + postId;
         await updateDoc(userRef,{
             [path]: true,
@@ -271,7 +271,7 @@ async function decrementPostRating(postId, postAuthor){
     else{
         currentUserVotedPosts.set(postId, false);
         let userid = await getUserId();
-        const userRef = doc(db, "users", userid);
+        const userRef = doc(db, "users_likes", userid);
         let path = 'votedposts.' + postId;
         await updateDoc(userRef,{
             [path]: false,
@@ -303,7 +303,7 @@ async function incrementCommentRating(postId, commentId, commentAuthor){
     else{
         currentUserVotedComments.set(commentId, true);
         let userid = await getUserId();
-        const userRef = doc(db, "users", userid);
+        const userRef = doc(db, "users_likes", userid);
         let path = 'votedcomments.' + postId + '.' + commentId;
         await updateDoc(userRef,{
             [path]: true,
@@ -334,7 +334,7 @@ async function decrementCommentRating(postId, commentId, commentAuthor){
     else{
         currentUserVotedComments.set(commentId, false);
         let userid = await getUserId();
-        const userRef = doc(db, "users", userid);
+        const userRef = doc(db, "users_likes", userid);
         let path = 'votedcomments.' + postId + '.' + commentId;
         await updateDoc(userRef,{
             [path]: false,
@@ -365,7 +365,7 @@ async function incrementSpeciesIdentificationRating(postId, speciesIdentificatio
     else{
         currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, true);
         let userid = await getUserId();
-        const userRef = doc(db, "users", userid);
+        const userRef = doc(db, "users_likes", userid);
         let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
         await updateDoc(userRef,{
             [path]: true,
@@ -397,7 +397,7 @@ async function decrementSpeciesIdentificationRating(postId, speciesIdentificatio
     else{
         currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, false);
         let userid = await getUserId();
-        const userRef = doc(db, "users", userid);
+        const userRef = doc(db, "users_likes", userid);
         let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
         await updateDoc(userRef,{
             [path]: false,
@@ -485,7 +485,7 @@ async function hasUserDislikedSpeciesIdentification(postId, speciesIdentificatio
 //TODO: Move liked posts/comments/speciesidentifications in another directory other than "users" such as "users_likes"
 async function getVotedPosts(){
     let userid = await getUserId();
-    const userRef = doc(db, "users", userid);
+    const userRef = doc(db, "users_likes", userid);
     const docSnap = await getDoc(userRef);
     if(docSnap.data().votedposts === undefined){
         currentUserVotedPosts = new Map();
@@ -497,7 +497,7 @@ async function getVotedPosts(){
 
 async function getVotedComments(postId){
     let userid = await getUserId();
-    const userRef = doc(db, "users", userid);
+    const userRef = doc(db, "users_likes", userid);
     const docSnap = await getDoc(userRef);
     if(docSnap.data().votedcomments === undefined || docSnap.data().votedcomments[postId] === undefined){
         currentUserVotedComments = new Map();
@@ -510,7 +510,7 @@ async function getVotedComments(postId){
 
 async function getVotedSpeciesIdentifications(postId){
     let userid = await getUserId();
-    const userRef = doc(db, "users", userid);
+    const userRef = doc(db, "users_likes", userid);
     const docSnap = await getDoc(userRef);
     if(docSnap.data().votedspeciesidentifications === undefined || docSnap.data().votedspeciesidentifications[postId] === undefined){
         currentUserVotedSpeciesIdentifications = new Map();

@@ -28,16 +28,25 @@ export async function makeUser(username, email, password) {
 
         const res = await createUserWithEmailAndPassword(auth, email, password);
         const ref = doc(db, "users", res.user.uid);
+        var today = new Date();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         await setDoc(ref, {
           username: username,
-          isModerator: false,
+          ismoderator: false,
           totalpostrating: 0,
           totalposts: 0,
           totalcommentrating: 0,
           totalcomments: 0,
           totalspeciesidentificationrating: 0,
-          totalspeciesidentifications: 0
+          totalspeciesidentifications: 0,
+          accountcreationdate: date,
         });
+
+        const likeref = doc(db, "users_likes", res.user.uid);
+        await setDoc(likeref, {
+          username: username,
+        })
+
         await updateProfile(auth.currentUser, {
           displayName: username,
         });

@@ -30,7 +30,13 @@ export async function makeUser(username, email, password) {
         const ref = doc(db, "users", res.user.uid);
         await setDoc(ref, {
           username: username,
-          isModerator: false
+          isModerator: false,
+          totalpostrating: 0,
+          totalposts: 0,
+          totalcommentrating: 0,
+          totalcomments: 0,
+          totalspeciesidentificationrating: 0,
+          totalspeciesidentifications: 0
         });
         await updateProfile(auth.currentUser, {
           displayName: username,

@@ -1,4 +1,13 @@
-.leaflet-container {
-    height: 80vh;
-    width: 80vw;
-  }
+.map-overall {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.map-td:nth-child(1) {
+    width: 30vw;
+    text-align: center;
+}
+
+.map-td:nth-child(2) {
+    width: 70vw;
+}

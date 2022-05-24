@@ -94,6 +94,9 @@ var currentUserVotedPosts;
 var currentUserVotedComments;
 var votedCommentsPost;
 
+var currentUserVotedSpeciesIdentifications;
+var votedSpeciesIdentificationsPost;
+
 async function addNewPost(post){
     const newPostRef = doc(collection(db, "posts")).withConverter(postConverter);
 
@@ -292,7 +295,7 @@ async function decrementPostRating(postId, postAuthor){
     return true;
 }
 
-async function incrementCommentRating(postId, commentId, postAuthor){
+async function incrementCommentRating(postId, commentId, commentAuthor){
     let repeatVoteCheck = await hasUserLikedComment(postId, commentId);
     if(repeatVoteCheck){
         return false;
@@ -312,7 +315,7 @@ async function incrementCommentRating(postId, commentId, postAuthor){
     });
 
     const authorRef = collection(db, "users");
-    const q = query(authorRef, where("username", "==", postAuthor));
+    const q = query(authorRef, where("username", "==", commentAuthor));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
@@ -323,13 +326,13 @@ async function incrementCommentRating(postId, commentId, postAuthor){
     return true;
 }
 
-async function decrementCommentRating(postId, commentId, postAuthor){
+async function decrementCommentRating(postId, commentId, commentAuthor){
     let repeatVoteCheck = await hasUserDislikedComment(postId, commentId);
     if(repeatVoteCheck){
         return false;
     }
     else{
-        currentUserVotedComments.set(commentId, true);
+        currentUserVotedComments.set(commentId, false);
         let userid = await getUserId();
         const userRef = doc(db, "users", userid);
         let path = 'votedcomments.' + postId + '.' + commentId;
@@ -343,7 +346,7 @@ async function decrementCommentRating(postId, commentId, postAuthor){
     });
 
     const authorRef = collection(db, "users");
-    const q = query(authorRef, where("username", "==", postAuthor));
+    const q = query(authorRef, where("username", "==", commentAuthor));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
@@ -354,20 +357,68 @@ async function decrementCommentRating(postId, commentId, postAuthor){
     return true;
 }
 
-async function incrementSpeciesIdentificationRating(postId, speciesIdentificationId){
-    //TODO: Check if user has already liked/disliked post
+async function incrementSpeciesIdentificationRating(postId, speciesIdentificationId, speciesIdentificationAuthor){
+    let repeatVoteCheck = await hasUserLikedSpeciesIdentification(postId, speciesIdentificationId);
+    if(repeatVoteCheck){
+        return false;
+    }
+    else{
+        currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, true);
+        let userid = await getUserId();
+        const userRef = doc(db, "users", userid);
+        let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
+        await updateDoc(userRef,{
+            [path]: true,
+        });
+    }
+
     const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
     updateDoc(ref,{
         rating: increment(1)
     });
+
+    const authorRef = collection(db, "users");
+    const q = query(authorRef, where("username", "==", speciesIdentificationAuthor));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref,{
+            totalspeciesidentificationrating: increment(1)
+        })
+    });
+
+    return true;
 }
 
-async function decrementSpeciesIdentificationRating(postId, speciesIdentificationId){
-    //TODO: Check if user has already liked/disliked post
+async function decrementSpeciesIdentificationRating(postId, speciesIdentificationId, speciesIdentificationAuthor){
+    let repeatVoteCheck = await hasUserDislikedSpeciesIdentification(postId, speciesIdentificationId);
+    if(repeatVoteCheck){
+        return false;
+    }
+    else{
+        currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, false);
+        let userid = await getUserId();
+        const userRef = doc(db, "users", userid);
+        let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
+        await updateDoc(userRef,{
+            [path]: false,
+        });
+    }
+
     const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
     updateDoc(ref,{
         rating: increment(-1)
     });
+
+    const authorRef = collection(db, "users");
+    const q = query(authorRef, where("username", "==", speciesIdentificationAuthor));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref,{
+            totalspeciesidentificationrating: increment(-1)
+        })
+    });
+
+    return true;
 }
 
 async function hasUserLikedPost(postId){
@@ -411,7 +462,27 @@ async function hasUserDislikedComment(postId, commentId){
     return false;
 }
 
+async function hasUserLikedSpeciesIdentification(postId, speciesIdentificationId){
+    if(currentUserVotedSpeciesIdentifications === undefined || votedSpeciesIdentificationsPost !== postId){
+        await getVotedSpeciesIdentifications(postId);
+    }
+    if(currentUserVotedSpeciesIdentifications.get(speciesIdentificationId) === true){
+        return true;
+    }
+    return false;
+}
+async function hasUserDislikedSpeciesIdentification(postId, speciesIdentificationId){
+    if(currentUserVotedSpeciesIdentifications === undefined || votedSpeciesIdentificationsPost !== postId){
+        await getVotedSpeciesIdentifications(postId);
+    }
+    if(currentUserVotedSpeciesIdentifications.get(speciesIdentificationId) === false){
+        return true;
+    }
+    return false;
+}
+
 //Helper functions, ignore
+//TODO: Move liked posts/comments/speciesidentifications in another directory other than "users" such as "users_likes"
 async function getVotedPosts(){
     let userid = await getUserId();
     const userRef = doc(db, "users", userid);
@@ -437,12 +508,25 @@ async function getVotedComments(postId){
     votedCommentsPost = postId;
 }
 
+async function getVotedSpeciesIdentifications(postId){
+    let userid = await getUserId();
+    const userRef = doc(db, "users", userid);
+    const docSnap = await getDoc(userRef);
+    if(docSnap.data().votedspeciesidentifications === undefined || docSnap.data().votedspeciesidentifications[postId] === undefined){
+        currentUserVotedSpeciesIdentifications = new Map();
+    }
+    else{
+        currentUserVotedSpeciesIdentifications = new Map(Object.entries(docSnap.data().votedspeciesidentifications[postId]));
+    }
+    votedSpeciesIdentificationsPost = postId;
+}
+
 export {Post, Comment, SpeciesIdentification, 
     addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, 
     addCommentToPost, getCommentsByPost, 
     addSpeciesIdentification, getSpeciesIdentificationByPost,
-    hasUserLikedPost, hasUserDislikedPost, hasUserLikedComment, hasUserDislikedComment,
-    //These following functions have a second parameter postAuthor which is the author of the post. This parameter is here to reduce the amount of
+    hasUserLikedPost, hasUserDislikedPost, hasUserLikedComment, hasUserDislikedComment, hasUserLikedSpeciesIdentification, hasUserDislikedSpeciesIdentification,
+    //These following functions have a second/third parameter *Author which is the author of the post/comment/species identification. This parameter is here to reduce the amount of
     //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the document
     //which includes the post author.
     incrementPostRating, decrementPostRating, incrementCommentRating, decrementCommentRating, incrementSpeciesIdentificationRating, decrementSpeciesIdentificationRating

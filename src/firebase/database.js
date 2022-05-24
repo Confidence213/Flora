@@ -91,6 +91,9 @@ const speciesIdentificationConverter ={
 
 var currentUserVotedPosts;
 
+var currentUserVotedComments;
+var votedCommentsPost;
+
 async function addNewPost(post){
     const newPostRef = doc(collection(db, "posts")).withConverter(postConverter);
 
@@ -289,20 +292,66 @@ async function decrementPostRating(postId, postAuthor){
     return true;
 }
 
-async function incrementCommentRating(postId, commentId){
-    //TODO: Check if user has already liked/disliked post
+async function incrementCommentRating(postId, commentId, postAuthor){
+    let repeatVoteCheck = await hasUserLikedComment(postId, commentId);
+    if(repeatVoteCheck){
+        return false;
+    }
+    else{
+        currentUserVotedComments.set(commentId, true);
+        let userid = await getUserId();
+        const userRef = doc(db, "users", userid);
+        let path = 'votedcomments.' + postId + '.' + commentId;
+        await updateDoc(userRef,{
+            [path]: true,
+        });
+    }
     const ref = doc(collection(db, "comments/" + postId + "/comments"), commentId);
     updateDoc(ref,{
         rating: increment(1)
     });
+
+    const authorRef = collection(db, "users");
+    const q = query(authorRef, where("username", "==", postAuthor));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref,{
+            totalcommentrating: increment(1)
+        })
+    });
+
+    return true;
 }
 
-async function decrementCommentRating(postId, commentId){
-    //TODO: Check if user has already liked/disliked post
+async function decrementCommentRating(postId, commentId, postAuthor){
+    let repeatVoteCheck = await hasUserDislikedComment(postId, commentId);
+    if(repeatVoteCheck){
+        return false;
+    }
+    else{
+        currentUserVotedComments.set(commentId, true);
+        let userid = await getUserId();
+        const userRef = doc(db, "users", userid);
+        let path = 'votedcomments.' + postId + '.' + commentId;
+        await updateDoc(userRef,{
+            [path]: false,
+        });
+    }
     const ref = doc(collection(db, "comments/" + postId + "/comments"), commentId);
     updateDoc(ref,{
         rating: increment(-1)
     });
+
+    const authorRef = collection(db, "users");
+    const q = query(authorRef, where("username", "==", postAuthor));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref,{
+            totalcommentrating: increment(-1)
+        })
+    });
+
+    return true;
 }
 
 async function incrementSpeciesIdentificationRating(postId, speciesIdentificationId){
@@ -331,13 +380,32 @@ async function hasUserLikedPost(postId){
     }
     return false;
 }
-
 async function hasUserDislikedPost(postId){
     if(currentUserVotedPosts === undefined){
         await getVotedPosts();
     }
 
     if(currentUserVotedPosts.get(postId) === false){
+        return true;
+    }
+    return false;
+}
+
+async function hasUserLikedComment(postId, commentId){
+    if(currentUserVotedComments === undefined || votedCommentsPost !== postId){
+        await getVotedComments(postId);
+    }
+    if(currentUserVotedComments.get(commentId) === true){
+        return true;
+    }
+    return false;
+}
+async function hasUserDislikedComment(postId, commentId){
+    if(currentUserVotedComments === undefined || votedCommentsPost !== postId){
+        await getVotedComments(postId);
+    }
+
+    if(currentUserVotedComments.get(commentId) === false){
         return true;
     }
     return false;
@@ -356,11 +424,24 @@ async function getVotedPosts(){
     }
 }
 
+async function getVotedComments(postId){
+    let userid = await getUserId();
+    const userRef = doc(db, "users", userid);
+    const docSnap = await getDoc(userRef);
+    if(docSnap.data().votedcomments === undefined || docSnap.data().votedcomments[postId] === undefined){
+        currentUserVotedComments = new Map();
+    }
+    else{
+        currentUserVotedComments = new Map(Object.entries(docSnap.data().votedcomments[postId]));
+    }
+    votedCommentsPost = postId;
+}
+
 export {Post, Comment, SpeciesIdentification, 
     addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, 
     addCommentToPost, getCommentsByPost, 
     addSpeciesIdentification, getSpeciesIdentificationByPost,
-    hasUserLikedPost, hasUserDislikedPost,
+    hasUserLikedPost, hasUserDislikedPost, hasUserLikedComment, hasUserDislikedComment,
     //These following functions have a second parameter postAuthor which is the author of the post. This parameter is here to reduce the amount of
     //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the document
     //which includes the post author.

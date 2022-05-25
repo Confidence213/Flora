@@ -234,13 +234,13 @@ async function getSpeciesIdentificationByPost(postId){
 async function toggleIncrementPostRating(postId, postAuthor){
     let repeatVoteCheck = await hasUserLikedPost(postId);
     let deltaRating;
+    let userid = await getUserId();
+    const userRef = doc(db, "users_likes", userid);
+    let path = 'votedposts.' + postId;
     if(repeatVoteCheck){
         deltaRating = -1;
 
         currentUserVotedPosts.delete(postId);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedposts.' + postId;
         await updateDoc(userRef,{
             [path]: deleteField(),
         });
@@ -249,11 +249,7 @@ async function toggleIncrementPostRating(postId, postAuthor){
         repeatVoteCheck = await hasUserDislikedPost(postId);
         deltaRating = (repeatVoteCheck)? 2: 1;
 
-        
         currentUserVotedPosts.set(postId, true);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedposts.' + postId;
         await updateDoc(userRef,{
             [path]: true,
         });
@@ -279,13 +275,13 @@ async function toggleIncrementPostRating(postId, postAuthor){
 async function toggleDecrementPostRating(postId, postAuthor){
     let repeatVoteCheck = await hasUserDislikedPost(postId);
     let deltaRating;
+    let userid = await getUserId();
+    const userRef = doc(db, "users_likes", userid);
+    let path = 'votedposts.' + postId;
     if(repeatVoteCheck){
         deltaRating = 1;
 
         currentUserVotedPosts.delete(postId);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedposts.' + postId;
         await updateDoc(userRef,{
             [path]: deleteField(),
         });
@@ -295,9 +291,6 @@ async function toggleDecrementPostRating(postId, postAuthor){
         deltaRating = (repeatVoteCheck)? -2: -1;
 
         currentUserVotedPosts.set(postId, false);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedposts.' + postId;
         await updateDoc(userRef,{
             [path]: false,
         });
@@ -320,23 +313,33 @@ async function toggleDecrementPostRating(postId, postAuthor){
     return true;
 }
 
-async function incrementCommentRating(postId, commentId, commentAuthor){
+async function toggleIncrementCommentRating(postId, commentId, commentAuthor){
     let repeatVoteCheck = await hasUserLikedComment(postId, commentId);
+    let deltaRating;
+    let userid = await getUserId();
+    const userRef = doc(db, "users_likes", userid);
+    let path = 'votedcomments.' + postId + '.' + commentId;
     if(repeatVoteCheck){
-        return false;
+        deltaRating = -1;
+
+        currentUserVotedComments.delete(commentId);
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
     }
     else{
+        repeatVoteCheck = await hasUserDislikedComment(postId, commentId);
+        deltaRating = (repeatVoteCheck)? 2: 1;
+
         currentUserVotedComments.set(commentId, true);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedcomments.' + postId + '.' + commentId;
         await updateDoc(userRef,{
             [path]: true,
         });
     }
+
     const ref = doc(collection(db, "comments/" + postId + "/comments"), commentId);
     updateDoc(ref,{
-        rating: increment(1)
+        rating: increment(deltaRating)
     });
 
     const authorRef = collection(db, "users");
@@ -344,30 +347,39 @@ async function incrementCommentRating(postId, commentId, commentAuthor){
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
-            totalcommentrating: increment(1)
+            totalcommentrating: increment(deltaRating)
         })
     });
 
     return true;
 }
 
-async function decrementCommentRating(postId, commentId, commentAuthor){
+async function toggleDecrementCommentRating(postId, commentId, commentAuthor){
     let repeatVoteCheck = await hasUserDislikedComment(postId, commentId);
+    let deltaRating;
+    let userid = await getUserId();
+    const userRef = doc(db, "users_likes", userid);
+    let path = 'votedcomments.' + postId + '.' + commentId;
     if(repeatVoteCheck){
-        return false;
+        deltaRating = 1;
+
+        currentUserVotedComments.delete(commentId);
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
     }
     else{
+        repeatVoteCheck = await hasUserLikedComment(postId, commentId);
+        deltaRating = (repeatVoteCheck)? -2: -1;
+
         currentUserVotedComments.set(commentId, false);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedcomments.' + postId + '.' + commentId;
         await updateDoc(userRef,{
             [path]: false,
         });
     }
     const ref = doc(collection(db, "comments/" + postId + "/comments"), commentId);
     updateDoc(ref,{
-        rating: increment(-1)
+        rating: increment(deltaRating)
     });
 
     const authorRef = collection(db, "users");
@@ -375,7 +387,7 @@ async function decrementCommentRating(postId, commentId, commentAuthor){
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
-            totalcommentrating: increment(-1)
+            totalcommentrating: increment(deltaRating)
         })
     });
 
@@ -554,5 +566,5 @@ export {Post, Comment, SpeciesIdentification,
     //These following functions have a second/third parameter *Author which is the author of the post/comment/species identification. This parameter is here to reduce the amount of
     //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the document
     //which includes the post author.
-    toggleIncrementPostRating, toggleDecrementPostRating, incrementCommentRating, decrementCommentRating, incrementSpeciesIdentificationRating, decrementSpeciesIdentificationRating
+    toggleIncrementPostRating, toggleDecrementPostRating, toggleIncrementCommentRating, toggleDecrementCommentRating, incrementSpeciesIdentificationRating, decrementSpeciesIdentificationRating
     };

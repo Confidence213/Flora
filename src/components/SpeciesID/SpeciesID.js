@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { getSpeciesIdentificationByPost,
-    incrementSpeciesIdentificationRating,
-    decrementSpeciesIdentificationRating,
+    toggleIncrementSpeciesIdentificationRating,
+    toggleDecrementSpeciesIdentificationRating,
     SpeciesIdentification, 
     addSpeciesIdentification} from '../../firebase/database';
 import './SpeciesID.css'
@@ -38,11 +38,11 @@ function SpeciesID(props) {
                                 <tr>
                                     <td class="speciesid-td">
                                         <button onClick={() => {
-                                                incrementSpeciesIdentificationRating(props.postid, guess?.id)
+                                                toggleIncrementSpeciesIdentificationRating(props.postid, guess?.id, guess?.author)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11014;</button>
                                         <button onClick={() => {
-                                            decrementSpeciesIdentificationRating(props.postid, guess?.id)
+                                            toggleDecrementSpeciesIdentificationRating(props.postid, guess?.id, guess?.author)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11015;</button>
                                         {moderator ? 

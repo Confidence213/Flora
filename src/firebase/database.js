@@ -394,16 +394,26 @@ async function toggleDecrementCommentRating(postId, commentId, commentAuthor){
     return true;
 }
 
-async function incrementSpeciesIdentificationRating(postId, speciesIdentificationId, speciesIdentificationAuthor){
+async function toggleIncrementSpeciesIdentificationRating(postId, speciesIdentificationId, speciesIdentificationAuthor){
     let repeatVoteCheck = await hasUserLikedSpeciesIdentification(postId, speciesIdentificationId);
+    let deltaRating;
+    let userid = await getUserId();
+    const userRef = doc(db, "users_likes", userid);
+    let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
+
     if(repeatVoteCheck){
-        return false;
+        deltaRating = -1;
+
+        currentUserVotedSpeciesIdentifications.delete(speciesIdentificationId);
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
     }
     else{
+        repeatVoteCheck = await hasUserDislikedSpeciesIdentification(postId, speciesIdentificationId);
+        deltaRating = (repeatVoteCheck)? 2: 1;
+
         currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, true);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
         await updateDoc(userRef,{
             [path]: true,
         });
@@ -411,7 +421,7 @@ async function incrementSpeciesIdentificationRating(postId, speciesIdentificatio
 
     const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
     updateDoc(ref,{
-        rating: increment(1)
+        rating: increment(deltaRating)
     });
 
     const authorRef = collection(db, "users");
@@ -419,23 +429,33 @@ async function incrementSpeciesIdentificationRating(postId, speciesIdentificatio
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
-            totalspeciesidentificationrating: increment(1)
+            totalspeciesidentificationrating: increment(deltaRating)
         })
     });
 
     return true;
 }
 
-async function decrementSpeciesIdentificationRating(postId, speciesIdentificationId, speciesIdentificationAuthor){
+async function toggleDecrementSpeciesIdentificationRating(postId, speciesIdentificationId, speciesIdentificationAuthor){
     let repeatVoteCheck = await hasUserDislikedSpeciesIdentification(postId, speciesIdentificationId);
+    let deltaRating;
+    let userid = await getUserId();
+    const userRef = doc(db, "users_likes", userid);
+    let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
+
     if(repeatVoteCheck){
-        return false;
+        deltaRating = 1;
+
+        currentUserVotedSpeciesIdentifications.delete(speciesIdentificationId);
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
     }
     else{
+        repeatVoteCheck = await hasUserLikedSpeciesIdentification(postId, speciesIdentificationId);
+        deltaRating = (repeatVoteCheck)? -2: -1;
+
         currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, false);
-        let userid = await getUserId();
-        const userRef = doc(db, "users_likes", userid);
-        let path = 'votedspeciesidentifications.' + postId + '.' + speciesIdentificationId;
         await updateDoc(userRef,{
             [path]: false,
         });
@@ -443,7 +463,7 @@ async function decrementSpeciesIdentificationRating(postId, speciesIdentificatio
 
     const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
     updateDoc(ref,{
-        rating: increment(-1)
+        rating: increment(deltaRating)
     });
 
     const authorRef = collection(db, "users");
@@ -451,7 +471,7 @@ async function decrementSpeciesIdentificationRating(postId, speciesIdentificatio
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
-            totalspeciesidentificationrating: increment(-1)
+            totalspeciesidentificationrating: increment(deltaRating)
         })
     });
 
@@ -519,7 +539,6 @@ async function hasUserDislikedSpeciesIdentification(postId, speciesIdentificatio
 }
 
 //Helper functions, ignore
-//TODO: Move liked posts/comments/speciesidentifications in another directory other than "users" such as "users_likes"
 async function getVotedPosts(){
     let userid = await getUserId();
     const userRef = doc(db, "users_likes", userid);
@@ -564,7 +583,7 @@ export {Post, Comment, SpeciesIdentification,
     addSpeciesIdentification, getSpeciesIdentificationByPost,
     hasUserLikedPost, hasUserDislikedPost, hasUserLikedComment, hasUserDislikedComment, hasUserLikedSpeciesIdentification, hasUserDislikedSpeciesIdentification,
     //These following functions have a second/third parameter *Author which is the author of the post/comment/species identification. This parameter is here to reduce the amount of
-    //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the document
+    //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the post document
     //which includes the post author.
-    toggleIncrementPostRating, toggleDecrementPostRating, toggleIncrementCommentRating, toggleDecrementCommentRating, incrementSpeciesIdentificationRating, decrementSpeciesIdentificationRating
+    toggleIncrementPostRating, toggleDecrementPostRating, toggleIncrementCommentRating, toggleDecrementCommentRating, toggleIncrementSpeciesIdentificationRating, toggleDecrementSpeciesIdentificationRating
     };

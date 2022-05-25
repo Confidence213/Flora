@@ -1,7 +1,12 @@
 div.page {
-  background-color: #E5E5E5;
+  background-color: #FFFFFF;
   margin: 0 3%;
-  text-align: center;
+  align-items: center;
+  display: flex
+}
+
+div.gallery {
+  width: 20;
 }
 
 .inputs {
@@ -10,6 +15,25 @@ div.page {
   float: left;
   padding: 2%;
   border-spacing: 10px;
+  text-align: center;
+}
+
+
+#long {
+  width: 30%;
+}
+
+#lat {
+  width: 30%;
+}
+
+#spinput{
+  width: 62%;
+}
+
+#title{
+  text-align: left;
+  margin: 0 5%;
 }
 
 #map {
@@ -17,21 +41,9 @@ div.page {
   float:right;
 }
 
-#locinput{
-  width: 70%;
-}
-#minput{
-  width: 15%;
-}
-
-#spinput{
-  width: 87%;
+.img {
+  object-fit: scale-down;
+  object-position: center;
+  height: 250px;
 }
 
-
-
-@media only screen and (max-width: 600px) {
-  div.page {
-    background-color: white;
-  }
-}

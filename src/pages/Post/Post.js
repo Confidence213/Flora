@@ -4,8 +4,8 @@ import MapFrame from '../../components/MapFrame/MapFrame';
 import SpeciesID from '../../components/SpeciesID/SpeciesID';
 import NotFound from '../NotFound/NotFound';
 import { getPostById,
-    incrementPostRating,
-    decrementPostRating } from '../../firebase/database';
+    toggleIncrementPostRating,
+    toggleDecrementPostRating } from '../../firebase/database';
 import './Post.css'
 
 function Post () {
@@ -48,12 +48,12 @@ function Post () {
         <p id="post-title">
             <section id="post-postvote">
                 <button onClick={() => {
-                    incrementPostRating(postid)
+                    toggleIncrementPostRating(postid, post.author)
                     .then((n) => {setTimeout(() => {getPost()}, 500)})
                 }}>&#11014;</button>
                 {" " + post?.rating + " "}
                 <button onClick={() => {
-                    decrementPostRating(postid)
+                    toggleDecrementPostRating(postid)
                     .then((n) => {setTimeout(() => {getPost()}, 500)})
                 }}>&#11015;</button>
             </section>

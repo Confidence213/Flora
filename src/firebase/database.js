@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy} from "firebase/firestore"; 
+import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy, deleteField } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {getUserId} from "./account.js"
 const storage = getStorage(app);
@@ -231,12 +231,25 @@ async function getSpeciesIdentificationByPost(postId){
     return map;
 }
 
-async function incrementPostRating(postId, postAuthor){
+async function toggleIncrementPostRating(postId, postAuthor){
     let repeatVoteCheck = await hasUserLikedPost(postId);
+    let deltaRating;
     if(repeatVoteCheck){
-        return false;
+        deltaRating = -1;
+
+        currentUserVotedPosts.delete(postId);
+        let userid = await getUserId();
+        const userRef = doc(db, "users_likes", userid);
+        let path = 'votedposts.' + postId;
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
     }
     else{
+        repeatVoteCheck = await hasUserDislikedPost(postId);
+        deltaRating = (repeatVoteCheck)? 2: 1;
+
+        
         currentUserVotedPosts.set(postId, true);
         let userid = await getUserId();
         const userRef = doc(db, "users_likes", userid);
@@ -245,10 +258,10 @@ async function incrementPostRating(postId, postAuthor){
             [path]: true,
         });
     }
-    
+
     const ref = doc(collection(db, 'posts'), postId);
     await updateDoc(ref,{
-        rating: increment(1)
+        rating: increment(deltaRating)
     });
 
     const authorRef = collection(db, "users");
@@ -256,19 +269,31 @@ async function incrementPostRating(postId, postAuthor){
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
-            totalpostrating: increment(1)
+            totalpostrating: increment(deltaRating)
         })
     });
 
     return true;
 }
 
-async function decrementPostRating(postId, postAuthor){
+async function toggleDecrementPostRating(postId, postAuthor){
     let repeatVoteCheck = await hasUserDislikedPost(postId);
+    let deltaRating;
     if(repeatVoteCheck){
-        return false;
+        deltaRating = 1;
+
+        currentUserVotedPosts.delete(postId);
+        let userid = await getUserId();
+        const userRef = doc(db, "users_likes", userid);
+        let path = 'votedposts.' + postId;
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
     }
     else{
+        repeatVoteCheck = await hasUserLikedPost(postId);
+        deltaRating = (repeatVoteCheck)? -2: -1;
+
         currentUserVotedPosts.set(postId, false);
         let userid = await getUserId();
         const userRef = doc(db, "users_likes", userid);
@@ -280,7 +305,7 @@ async function decrementPostRating(postId, postAuthor){
     
     const ref = doc(collection(db, 'posts'), postId);
     await updateDoc(ref,{
-        rating: increment(-1)
+        rating: increment(deltaRating)
     });
 
     const authorRef = collection(db, "users");
@@ -288,7 +313,7 @@ async function decrementPostRating(postId, postAuthor){
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         updateDoc(doc.ref,{
-            totalpostrating: increment(-1)
+            totalpostrating: increment(deltaRating)
         })
     });
 
@@ -529,5 +554,5 @@ export {Post, Comment, SpeciesIdentification,
     //These following functions have a second/third parameter *Author which is the author of the post/comment/species identification. This parameter is here to reduce the amount of
     //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the document
     //which includes the post author.
-    incrementPostRating, decrementPostRating, incrementCommentRating, decrementCommentRating, incrementSpeciesIdentificationRating, decrementSpeciesIdentificationRating
+    toggleIncrementPostRating, toggleDecrementPostRating, incrementCommentRating, decrementCommentRating, incrementSpeciesIdentificationRating, decrementSpeciesIdentificationRating
     };

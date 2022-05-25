@@ -1,21 +1,22 @@
 import React from 'react';
 import './Upload.css'
 import {Post, addNewPost, getAllPosts} from "../../firebase/database"
-import {getUsername} from "../../firebase/account"
+import {userLoggedIn, getUsername} from "../../firebase/account"
 
 
 
 class UploadPage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {loaded: false, species: '', lat: '', long: '', image: null, imageFile: null, showSpecies: false, showLocation: false, showImage: false, map: null};
+
+    this.state = {loaded: false, species: '', lat: '', long: '', image: null, imageFile: null, showSpecies: false, showLocation: false, showImage: false, map: null, loggedIn: true};
 
     this.handleChange1 = this.handleChange1.bind(this);
     this.handleChange2 = this.handleChange2.bind(this);
     this.handleChange3 = this.handleChange3.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleImage = this.handleImage.bind(this);
-    this.handleLocation = this.handleLocation.bind(this);
+    this.handleLocation = this.handleLocation.bind(this); 
 
   }
 
@@ -26,8 +27,9 @@ class UploadPage extends React.Component {
   latRef = React.createRef();
   longRef = React.createRef();
 
-  componentDidMount(){
-    this.setState({loaded: true });
+  async componentDidMount(){
+    const m_signedIn = await userLoggedIn();
+    this.setState({loaded: true, loggedIn: m_signedIn});
   }
 
   async handleLocation() {
@@ -59,7 +61,7 @@ class UploadPage extends React.Component {
     else
       this.setState({showSpecies: false });
 
-    if (this.state.lat == '' || this.state.long == '')
+    if (this.state.lat == '' || this.state.long == '' || isNaN(this.state.lat) || isNaN(this.state.long))
     {
       this.setState({showLocation: true });
       canPost = false;
@@ -85,7 +87,7 @@ class UploadPage extends React.Component {
       var myPost = new Post(username, "title", "description", this.state.species, this.state.imageFile, this.state.lat, this.state.long, date);
 
       if(await addNewPost(myPost)){
-        alert("Post successfuly made! (I hope..??!?)");
+        alert("Post successfuly made!");
         //this.setState({map: getAllPosts()});
         window.location = "/";
       }
@@ -113,36 +115,42 @@ class UploadPage extends React.Component {
 
   render() {
   return (
+
+  <div>
+    {this.state.loggedIn ?
+          
     <table className="page">
-      <tc>
-        <div className="image_input">
-          <h3>Add Image:</h3>
-          <input type="file" onChange={this.handleImage} accept="image/png, image/gif, image/jpeg" />
-          <img id="image" src={this.state.image}/>
-          {this.state.showImage && <p id='imageError'>Please enter Image</p>}
-        </div>
-      </tc>
+    <tc>
+      <div className="image_input">
+        <h3>Add Image:</h3>
+        <input type="file" onChange={this.handleImage} accept="image/png, image/gif, image/jpeg" />
+        <img id="image" src={this.state.image}/>
+        {this.state.showImage && <p id='imageError'>Please enter Image</p>}
+      </div>
+    </tc>
 
-      <tc>
-        <div className="other_input">
-          <h3>Species: </h3>
+    <tc>
+      <div className="other_input">
+        <h3>Species: </h3>
 
-          <input type="text" onChange={this.handleChange1}/>
-          {this.state.showSpecies && <p id='speciesError'>Please enter Species</p>}
-          <h3>Lat and Long: </h3>
-          <input type="text" ref={this.latRef} onChange={this.handleChange2} />
+        <input type="text" onChange={this.handleChange1}/>
+        {this.state.showSpecies && <p id='speciesError'>Please enter valid Species</p>}
+        <h3>Lat and Long: </h3>
+        <input type="text" ref={this.latRef} onChange={this.handleChange2} />
 
-          <input type="text" ref={this.longRef} onChange={this.handleChange3}/>
-          {this.state.showLocation && <p id='locationError'>Please enter Location</p>}
-          <h3></h3>
-          <h2></h2>
-          <button onClick={this.handleLocation} className="post">Get Current Location</button>
-          <button onClick={this.handleSubmit} className="post">POST</button>
-        </div>
-      </tc>
-      
-    </table>
-  
+        <input type="text" ref={this.longRef} onChange={this.handleChange3}/>
+        {this.state.showLocation && <p id='locationError'>Please enter valid Location</p>}
+        <h3></h3>
+        <h2></h2>
+        <button onClick={this.handleLocation} className="post">Get Current Location</button>
+        <button onClick={this.handleSubmit} className="post">POST</button>
+      </div>
+    </tc>
+  </table>
+:
+<h2>Error: Not logged in</h2>
+    }
+    </div>
     );
   }
 }

@@ -77,7 +77,11 @@ export async function getUsername() {
 
 
 export async function signOutUser() {
-    await signOut();
+  signOut(auth).then(function() {
+    return true;
+  }, function(error) {
+    return false;
+  });
 }
 
 export async function getUserId(){

@@ -11,3 +11,24 @@
 .map-td:nth-child(2) {
     width: 70vw;
 }
+
+.searchBar {
+    text-align: center;
+}
+
+.input {
+    font-size:14pt;
+    width: 70%;
+}
+
+.button {
+    font-size: 12pt;
+}
+
+.searchTable {
+    border: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    width:95vw!important;
+}
+

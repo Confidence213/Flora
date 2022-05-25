@@ -10,6 +10,10 @@ function Map () {
   let defaultCenter = [lat ?? 34.072830, lng ?? -118.451346];
   let defaultZoom = zm ?? 9;
 
+  let speciesInput = React.createRef();
+  let longInput = React.createRef();
+  let latInput = React.createRef();
+
   const [bounds, setBounds] = useState(null);
   const [points, setPoints] = useState([]);
 
@@ -73,24 +77,55 @@ function Map () {
     setClickIndex(i);
   }
 
+  const handleClick = (a) => {
+    if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
+      window.location = "/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value;
+
+  }
+
+  const handleLocation = (a) => {
+    if (!"geolocation" in navigator) {
+      alert("error: geological data not available")
+    }
+    else {
+      navigator.geolocation.getCurrentPosition( (position) => {    
+        latInput.current.value = position.coords.latitude;
+        longInput.current.value = position.coords.longitude;
+      });
+    }
+  }
+
   return (
-    <div class="map-overall">
-    <table>
-      <tr>
-      <td>Southwest lng: {debouncedBounds?._southWest.lng} </td>
-      <td>Southwest lat: {debouncedBounds?._southWest.lat} </td>
-      <td>Northeast lng: {debouncedBounds?._northEast.lng} </td>
-      <td>Northeast lat: {debouncedBounds?._northEast.lat} </td>
-      </tr>
-    </table>
-    <table class="map-table">
-      <tr>
-      <td class="map-td"><PostList list={list} listClick={handleListClick}/></td>
-      <td class="map-td"><MapFrame setBounds={setBounds} points={points} defaultCenter={defaultCenter} 
-        small={false} defaultZoom={defaultZoom} clickIndex={clickIndex} clickUpdate={clickUpdate} />
-        </td>
+    <div>
+      <div class="searchBar">
+        <table class="searchTable"><tr>
+            <th><input ref={latInput} class="input" placeholder="*Latitude..." /></th>
+            <th><input ref={longInput} class="input" placeholder="*Longitude..." /></th>
+            <th><input class="input" ref={speciesInput} placeholder="Species..." /></th>
+            <th><button onClick={handleLocation} className="button">Current Location</button></th>
+            <th><button onClick={handleClick} className="button">SEARCH</button></th>
+        </tr></table>
+        <h2></h2>
+      </div> 
+  
+      <div class="map-overall">
+      {/*<table>
+        <tr>
+        <td>Southwest lng: {debouncedBounds?._southWest.lng} </td>
+        <td>Southwest lat: {debouncedBounds?._southWest.lat} </td>
+        <td>Northeast lng: {debouncedBounds?._northEast.lng} </td>
+        <td>Northeast lat: {debouncedBounds?._northEast.lat} </td>
         </tr>
-    </table>
+      </table>*/}
+      <table class="map-table">
+        <tr>
+        <td class="map-td"><PostList list={list} listClick={handleListClick}/></td>
+        <td class="map-td"><MapFrame setBounds={setBounds} points={points} defaultCenter={defaultCenter} 
+          small={false} defaultZoom={defaultZoom} clickIndex={clickIndex} clickUpdate={clickUpdate} />
+          </td>
+          </tr>
+      </table>
+      </div>
     </div>
   ); 
 }

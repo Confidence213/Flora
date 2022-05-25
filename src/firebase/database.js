@@ -38,6 +38,20 @@ class SpeciesIdentification extends Comment{
     }
 }
 
+class UserProfileStatistics{
+    constructor(accountCreationDate, isModerator, totalCommentRating, totalComments, totalPostRating, totalPosts, totalSpeciesIdentificationRating, totalSpeciesIdentifications, username){
+        this.accountCreationDate = accountCreationDate;
+        this.isModerator = isModerator;
+        this.totalCommentRating = totalCommentRating;
+        this.totalComments = totalComments;
+        this.totalPostRating = totalPostRating;
+        this.totalPosts = totalPosts;
+        this.totalSpeciesIdentificationRating = totalSpeciesIdentificationRating;
+        this.totalSpeciesIdentifications = totalSpeciesIdentifications;
+        this.username = username;
+    }
+}
+
 const postConverter = {
     toFirestore: (post) => {
         return {
@@ -86,6 +100,26 @@ const speciesIdentificationConverter ={
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
         return new SpeciesIdentification(data.species, data.text, data.author, data.date, data.rating, snapshot.id);
+    }
+}
+
+const userProfileStatisticsConverter ={
+    toFirestore: (userProfileStatistics) => {
+        return {
+            username: userProfileStatistics.username,
+            ismoderator: userProfileStatistics.isModerator,
+            totalpostrating: userProfileStatistics.totalPostRating,
+            totalposts: userProfileStatistics.totalPosts,
+            totalcommentrating: userProfileStatistics.totalCommentRating,
+            totalcomments: userProfileStatistics.totalComments,
+            totalspeciesidentificationrating: userProfileStatistics.totalSpeciesIdentificationRating,
+            totalspeciesidentifications: userProfileStatistics.totalSpeciesIdentifications,
+            accountcreationdate: userProfileStatistics.accountCreationDate,
+        };
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return new UserProfileStatistics(data.accountcreationdate, data.ismoderator, data.totalcommentrating, data.totalcomments, data.totalpostrating, data.totalposts, data.totalspeciesidentificationrating, data.totalspeciesidentifications, data.username);
     }
 }
 
@@ -229,6 +263,17 @@ async function getSpeciesIdentificationByPost(postId){
         map.set(doc.id, doc.data());
     });
     return map;
+}
+
+async function getUserProfileStatistics(username){
+    const ref = collection(db, "users").withConverter(userProfileStatisticsConverter);
+    const q = query(ref, where("username", "==", username));
+    const querySnapshot = await getDocs(q);
+    let profile;
+    querySnapshot.forEach((doc) => {
+        profile = doc.data();
+    });
+    return profile;
 }
 
 async function toggleIncrementPostRating(postId, postAuthor){
@@ -581,6 +626,7 @@ export {Post, Comment, SpeciesIdentification,
     addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, 
     addCommentToPost, getCommentsByPost, 
     addSpeciesIdentification, getSpeciesIdentificationByPost,
+    getUserProfileStatistics,
     hasUserLikedPost, hasUserDislikedPost, hasUserLikedComment, hasUserDislikedComment, hasUserLikedSpeciesIdentification, hasUserDislikedSpeciesIdentification,
     //These following functions have a second/third parameter *Author which is the author of the post/comment/species identification. This parameter is here to reduce the amount of
     //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the post document

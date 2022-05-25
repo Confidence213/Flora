@@ -153,6 +153,12 @@ async function addNewPost(post){
         totalposts: increment(1),
     });
 
+    const speciesIdentificationRef = doc(db, "species_identification", newPostRef.id);
+    await setDoc(speciesIdentificationRef,{
+        status: false,
+        pinnedspeciesidentification: "",
+    });
+
     return true;
 }
 

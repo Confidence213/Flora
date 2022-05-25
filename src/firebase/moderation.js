@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, doc, updateDoc} from "firebase/firestore"; 
+import { getFirestore, doc, updateDoc, getDoc} from "firebase/firestore"; 
 import { getUserProfileStatistics } from "./database.js";
 import { getUsername } from "./account.js";
 const db = getFirestore(app);
@@ -28,4 +28,10 @@ async function setStatus(postId, status){
     });
 }
 
-export{isUserModerator, pinSpeciesIdentification, setStatus}
+async function getSpeciesIdentificationPostMetaData(postId){
+    const speciesIdentificationRef = doc(db, "species_identification", postId);
+    const docSnap = await getDoc(speciesIdentificationRef);
+    return docSnap.data();
+}
+
+export{isUserModerator, pinSpeciesIdentification, setStatus, getSpeciesIdentificationPostMetaData}

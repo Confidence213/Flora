@@ -1,4 +1,5 @@
 import { setSelectionRange } from '@testing-library/user-event/dist/utils';
+import { Navigate, useNavigate } from 'react-router-dom';
 import React, {useState} from 'react';
 import './Home.css'
 
@@ -9,9 +10,11 @@ function UploadPage() {
   let longInput = React.createRef();
   let latInput = React.createRef();
 
+  const navigate = useNavigate();
+
   const handleClick = (a) => {
     if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
-      window.location = "/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value;
+      navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value);
     else
       setShowLoc(true);
   }

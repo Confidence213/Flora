@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import './Map.css'
 import { getPostsByLocation, getPostsBySpeciesAndLocation } from '../../firebase/database';
 import MapFrame from '../../components/MapFrame/MapFrame';
@@ -22,6 +22,8 @@ function Map () {
   
   const [clickIndex, setClickIndex] = useState(null);
   const [clickUpdate, setClickUpdate] = useState(false);
+
+  const navigate = useNavigate();
 
   async function getList() {
       const m_list = spc ? await getPostsBySpeciesAndLocation(spc, debouncedBounds?._northEast.lng, 
@@ -80,8 +82,8 @@ function Map () {
 
   const handleClick = (a) => {
     if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
-      window.location = "/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value;
-
+      //window.location = "/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value;
+      navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value);
   }
 
   const handleLocation = (a) => {

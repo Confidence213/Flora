@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'
 import './Map.css'
 import { getPostsByLocation, getPostsBySpeciesAndLocation } from '../../firebase/database';
 import MapFrame from '../../components/MapFrame/MapFrame';
@@ -40,7 +41,7 @@ function Map () {
         setList(Array.from(m_list.values()));
         setPoints(Array.from(m_list.values()).map((info) => ({
           position: [info.latitude, info.longitude],
-          message: <div><p>{info.species} seen {info.date}</p><a href={"/post/" + info.id}>View Post</a></div>
+          message: <div><p>{info.species} seen {info.date}</p><Link to={"/post/" + info.id}>View Post</Link></div>
         })));
       }
   }

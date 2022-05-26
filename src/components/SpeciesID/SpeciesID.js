@@ -4,11 +4,15 @@ import { getSpeciesIdentificationByPost,
     toggleDecrementSpeciesIdentificationRating,
     SpeciesIdentification, 
     addSpeciesIdentification} from '../../firebase/database';
+
+import { getUsername } from '../../firebase/account';
 import './SpeciesID.css'
 
 function SpeciesID(props) {
     const [input, setInput] = useState("");
     const [list, setList] = useState(null);
+
+    const [username, setUsername] = useState(null);
 
     async function getList() {
         const m_list = await getSpeciesIdentificationByPost(props.postid);
@@ -21,8 +25,14 @@ function SpeciesID(props) {
         }
     }
 
+    async function getUserInfo() {
+        const m_username = await getUsername();
+        setUsername(m_username);
+    }
+
     useEffect(() => {
         getList();
+        getUserInfo();
       }, []);
 
     let moderator = true;
@@ -38,11 +48,11 @@ function SpeciesID(props) {
                                 <tr>
                                     <td class="speciesid-td">
                                         <button onClick={() => {
-                                                toggleIncrementSpeciesIdentificationRating(props.postid, guess?.id, guess?.author)
+                                                toggleIncrementSpeciesIdentificationRating(props.postid, guess?.id, username)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11014;</button>
                                         <button onClick={() => {
-                                            toggleDecrementSpeciesIdentificationRating(props.postid, guess?.id, guess?.author)
+                                            toggleDecrementSpeciesIdentificationRating(props.postid, guess?.id, username)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11015;</button>
                                         {moderator ? 
@@ -72,7 +82,7 @@ function SpeciesID(props) {
                 value={input} onChange={(e) => setInput(e.target.value)}/>
                 <span id="speciesid-formpad"></span>
                 <button onClick={() => {
-                    const si = new SpeciesIdentification(input, "", "changeme", new Date().toISOString());
+                    const si = new SpeciesIdentification(input, "", username, new Date().toISOString());
                     console.log(si);
                     setInput("");
                     addSpeciesIdentification(si, props.postid)

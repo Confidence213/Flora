@@ -35,7 +35,7 @@ function Header () {
             <h2><Link class="header-link" to="/">FloraFauna</Link></h2>
             {signedIn ?
                 <table class="header-table"><tr>
-                    <th><Link class="header-link" to="/">Hello, {username}</Link></th>
+                    <th>Hello, {username}</th>
                     <th><Link class="header-link" to="/profile/me">Profile</Link></th>
                     <th><Link class="header-link" to="/upload">New Post</Link></th>
                     <th><a href="#" class="header-link" onClick={handleLogout}>Log Out</a></th>

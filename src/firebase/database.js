@@ -213,6 +213,17 @@ async function getPostsBySpecies(species){
     return map;
 }
 
+async function getPostsByUsername(username){
+    const ref = collection(db, "posts").withConverter(postConverter);
+    const q = query(ref, where("author", "==", username), orderBy("rating","desc"));
+    const querySnapshot = await getDocs(q);
+    let map = new Map();
+    querySnapshot.forEach((doc) => {
+        map.set(doc.id, doc.data());
+    });
+    return map;
+}
+
 async function getPostsByLocation(longMax, longMin, latMax, latMin){
     const ref = collection(db, "posts").withConverter(postConverter);
     const q = query(ref, where("longitude", "<=", longMax), where("longitude", ">=", longMin));
@@ -629,7 +640,7 @@ async function getVotedSpeciesIdentifications(postId){
 }
 
 export {Post, Comment, SpeciesIdentification, 
-    addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, 
+    addNewPost, getPostById, getAllPosts, getPostsBySpecies, getPostsByLocation, getPostsBySpeciesAndLocation, getPostsByUsername,
     addCommentToPost, getCommentsByPost, 
     addSpeciesIdentification, getSpeciesIdentificationByPost,
     getUserProfileStatistics,

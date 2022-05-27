@@ -15,6 +15,7 @@ function Map () {
   let longInput = React.createRef();
   let latInput = React.createRef();
   let zoomInput = React.createRef();
+  let button = React.createRef();
 
   const [bounds, setBounds] = useState(null);
   const [points, setPoints] = useState([]);
@@ -94,6 +95,7 @@ function Map () {
   }
 
   const handleLocation = (a) => {
+    button.current.style.background = 'grey';
     if (!"geolocation" in navigator) {
       alert("error: geological data not available")
     }
@@ -101,6 +103,7 @@ function Map () {
       navigator.geolocation.getCurrentPosition( (position) => {    
         latInput.current.value = position.coords.latitude;
         longInput.current.value = position.coords.longitude;
+        button.current.style.background = 'white';
       });
     }
   }
@@ -113,7 +116,7 @@ function Map () {
             <th><input ref={longInput} class="input" placeholder="*Longitude..." /></th>
             <th><input ref={zoomInput} class ="input" placeholder="zoom level..." /></th>
             <th><input class="input"  ref={speciesInput} placeholder="Species..." /></th>
-            <th><button onClick={handleLocation} className="button">Current Location</button></th>
+            <th><button onClick={handleLocation} className="button" ref={button}>Current Location</button></th>
             <th><button onClick={handleClick} className="button">SEARCH</button></th>
         </tr></table>
         <h2></h2>

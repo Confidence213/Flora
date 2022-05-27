@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom'
 import React, {useState} from 'react';
 import './Home.css'
 
@@ -10,6 +9,7 @@ function UploadPage() {
   let longInput = React.createRef();
   let zoomInput = React.createRef();
   let latInput = React.createRef();
+  let button = React.createRef();
 
   const navigate = useNavigate();
 
@@ -25,6 +25,7 @@ function UploadPage() {
   }
 
   const handleLocation = (a) => {
+    button.current.style.background = 'grey';
     if (!"geolocation" in navigator) {
       alert("error: geological data not available")
     }
@@ -32,6 +33,7 @@ function UploadPage() {
       navigator.geolocation.getCurrentPosition( (position) => {    
         latInput.current.value = position.coords.latitude;
         longInput.current.value = position.coords.longitude;
+        button.current.style.background = 'white';
       });
     }
   }
@@ -49,7 +51,7 @@ function UploadPage() {
           </tr>
           
           <tr><input id="spinput" ref={speciesInput} placeholder="Search Species...(optional)" /></tr>
-          <tr><button onClick={handleLocation} className="post">Get Current Location</button>
+          <tr><button onClick={handleLocation} ref={button}>Get Current Location</button>
           <button onClick={handleClick} className="search">SEARCH</button></tr>
           <Link to="/map">Or Explore Map</Link>
         </table>

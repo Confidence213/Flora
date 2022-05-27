@@ -26,6 +26,7 @@ class UploadPage extends React.Component {
 
   latRef = React.createRef();
   longRef = React.createRef();
+  button = React.createRef();
 
   async componentDidMount(){
     const m_signedIn = await userLoggedIn();
@@ -79,6 +80,7 @@ class UploadPage extends React.Component {
 
     if (canPost == true)
     {
+      this.button.current.style.background = 'grey';
       const username = await getUsername();
 
       var today = new Date();
@@ -87,6 +89,7 @@ class UploadPage extends React.Component {
       var myPost = new Post(username, "title", "description", this.state.species, this.state.imageFile, this.state.lat, this.state.long, date);
 
       if(await addNewPost(myPost)){
+        this.button.current.style.background = 'white';
         alert("Post successfuly made!");
         //this.setState({map: getAllPosts()});
         window.location = "/";
@@ -143,7 +146,7 @@ class UploadPage extends React.Component {
         <h3></h3>
         <h2></h2>
         <button onClick={this.handleLocation} className="post">Get Current Location</button>
-        <button onClick={this.handleSubmit} className="post">POST</button>
+        <button onClick={this.handleSubmit} ref={this.button} className="post">POST</button>
       </div>
     </tc>
   </table>

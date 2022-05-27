@@ -59,9 +59,9 @@ function UploadPage() {
       <div className="gallery">
         <h3 id="title"> This Week's Gallery</h3> <h2></h2>
         <Link to="/post/UpkFbAUlB9sfUCm5MLC1"><img class="img" src="https://media.thetab.com/blogs.dir/179/files/2017/04/matts-pic-600x284.jpg"/></Link>
-        <Link to="/post/14seV2gHyOcd58gmPdVh"><img class="img" src="https://i.imgur.com/dligDo7.jpg"/></Link>
+        <Link to="/post/dwk6zCvUuiPR3iU1Bi0y"><img class="img" src="https://i.imgur.com/dligDo7.jpg"/></Link>
         <Link to="/post/14seV2gHyOcd58gmPdVh"><img class="img" src="https://i.imgur.com/GLpoJXA.jpg"/></Link>
-        <Link to="/post/14seV2gHyOcd58gmPdVh"><img class="img" src="https://i.redd.it/oxqwjebtg5g81.jpg"/></Link>
+        <Link to="/post/yEefsX9HRCwJXxvnWsDL"><img class="img" src="https://i.redd.it/oxqwjebtg5g81.jpg"/></Link>
         <Link to="/post/GAqIP8UR7MyL2nDpjjBs"><img class="img" src="https://i.redd.it/f4vi3qlv24t71.jpg"/></Link>
       </div>
     </div>

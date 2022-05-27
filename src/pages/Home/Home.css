@@ -20,30 +20,38 @@ div.gallery {
 
 
 #long {
-  width: 30%;
+  width: 25%;
 }
 
 #lat {
-  width: 30%;
+  width: 25%;
+}
+
+#zoom {
+  width: 10%;
 }
 
 #spinput{
   width: 62%;
 }
 
-#title{
-  text-align: left;
-  margin: 0 5%;
-}
 
 #map {
   width: 50%;
   float:right;
 }
 
+div.gallery {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
 .img {
-  object-fit: scale-down;
+  object-fit: cover;
   object-position: center;
-  height: 250px;
+  height: 200px;
+  width: 250px;
+  padding: .5%
 }
 

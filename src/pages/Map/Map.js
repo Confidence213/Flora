@@ -14,6 +14,7 @@ function Map () {
   let speciesInput = React.createRef();
   let longInput = React.createRef();
   let latInput = React.createRef();
+  let zoomInput = React.createRef();
 
   const [bounds, setBounds] = useState(null);
   const [points, setPoints] = useState([]);
@@ -81,9 +82,15 @@ function Map () {
   }
 
   const handleClick = (a) => {
+    var zoom = 9;
+    if (!(zoomInput.current.value == '' || isNaN(zoomInput.current.value)))
+      zoom = parseInt(zoomInput.current.value);
+
     if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
-      //window.location = "/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value;
-      navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value);
+    {
+        navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/" + zoom +"/" + speciesInput.current.value);
+        document.location.reload();
+    }
   }
 
   const handleLocation = (a) => {
@@ -104,7 +111,8 @@ function Map () {
         <table class="searchTable"><tr>
             <th><input ref={latInput} class="input" placeholder="*Latitude..." /></th>
             <th><input ref={longInput} class="input" placeholder="*Longitude..." /></th>
-            <th><input class="input" ref={speciesInput} placeholder="Species..." /></th>
+            <th><input ref={zoomInput} class ="input" placeholder="zoom level..." /></th>
+            <th><input class="input"  ref={speciesInput} placeholder="Species..." /></th>
             <th><button onClick={handleLocation} className="button">Current Location</button></th>
             <th><button onClick={handleClick} className="button">SEARCH</button></th>
         </tr></table>

@@ -1,5 +1,5 @@
-import { setSelectionRange } from '@testing-library/user-event/dist/utils';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import React, {useState} from 'react';
 import './Home.css'
 
@@ -8,13 +8,18 @@ function UploadPage() {
 
   let speciesInput = React.createRef();
   let longInput = React.createRef();
+  let zoomInput = React.createRef();
   let latInput = React.createRef();
 
   const navigate = useNavigate();
 
   const handleClick = (a) => {
+    var zoom = 9;
+    if (!(zoomInput.current.value == '' || isNaN(zoomInput.current.value)))
+      zoom = parseInt(zoomInput.current.value);
+
     if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
-      navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/9/" + speciesInput.current.value);
+        navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/" + zoom +"/" + speciesInput.current.value);
     else
       setShowLoc(true);
   }
@@ -40,22 +45,25 @@ function UploadPage() {
             <input ref={latInput} id="lat" placeholder="*Enter Latitude..." />
             <input ref={longInput} id="long" placeholder="*Enter Longitude..." />
             {showLoc && <p id='speciesError'>Please enter valid lat and long</p>}
+            <input ref={zoomInput} id="zoom" placeholder="zoom level..." />
           </tr>
           
           <tr><input id="spinput" ref={speciesInput} placeholder="Search Species...(optional)" /></tr>
           <tr><button onClick={handleLocation} className="post">Get Current Location</button>
           <button onClick={handleClick} className="search">SEARCH</button></tr>
+          <Link to="/map">Or Explore Map</Link>
         </table>
         <img id="map" src="https://svgshare.com/i/gvs.svg" alt="graphic_map"/>
       </div>
       <h2></h2>
+      <div className="gallery">
         <h3 id="title"> This Week's Gallery</h3> <h2></h2>
-        <img class="img" src="https://media.thetab.com/blogs.dir/179/files/2017/04/matts-pic-600x284.jpg"/>
-        <img class="img" src="https://i.imgur.com/dligDo7.jpg"/>
-        <img class="img" src="https://i.imgur.com/GLpoJXA.jpg"/>
-        <img class="img" src="https://i.redd.it/oxqwjebtg5g81.jpg"/>
-        <img class="img" src="https://i.redd.it/f4vi3qlv24t71.jpg"/>
-      
+        <Link to="/post/UpkFbAUlB9sfUCm5MLC1"><img class="img" src="https://media.thetab.com/blogs.dir/179/files/2017/04/matts-pic-600x284.jpg"/></Link>
+        <Link to="/post/14seV2gHyOcd58gmPdVh"><img class="img" src="https://i.imgur.com/dligDo7.jpg"/></Link>
+        <Link to="/post/14seV2gHyOcd58gmPdVh"><img class="img" src="https://i.imgur.com/GLpoJXA.jpg"/></Link>
+        <Link to="/post/14seV2gHyOcd58gmPdVh"><img class="img" src="https://i.redd.it/oxqwjebtg5g81.jpg"/></Link>
+        <Link to="/post/GAqIP8UR7MyL2nDpjjBs"><img class="img" src="https://i.redd.it/f4vi3qlv24t71.jpg"/></Link>
+      </div>
     </div>
   );
 }

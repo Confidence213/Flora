@@ -159,7 +159,7 @@ async function addNewPost(post){
         pinnedspeciesidentification: "",
     });
 
-    return true;
+    return newPostRef.id;
 }
 
 async function addCommentToPost(comment, postId){

@@ -1,9 +1,7 @@
 import React from 'react';
 import './Upload.css'
-import {Post, addNewPost, getAllPosts} from "../../firebase/database"
+import {Post, addNewPost} from "../../firebase/database"
 import {userLoggedIn, getUsername} from "../../firebase/account"
-
-
 
 class UploadPage extends React.Component {
   constructor(props) {
@@ -88,12 +86,10 @@ class UploadPage extends React.Component {
 
       var myPost = new Post(username, "title", "description", this.state.species, this.state.imageFile, this.state.lat, this.state.long, date);
 
-      if(await addNewPost(myPost)){
-        this.button.current.style.background = 'white';
-        alert("Post successfuly made!");
-        //this.setState({map: getAllPosts()});
-        window.location = "/";
-      }
+      var postid = await addNewPost(myPost)
+      this.button.current.style.background = 'white';
+      alert(postid);
+      window.location = "/post/" + postid;
     }
 
     //alert(this.state.species + this.state.location);

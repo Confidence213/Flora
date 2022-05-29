@@ -87,10 +87,15 @@ function Map () {
     if (!(zoomInput.current.value == '' || isNaN(zoomInput.current.value)))
       zoom = parseInt(zoomInput.current.value);
 
-    if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
+    if (longInput.current.value.length >= 20 || latInput.current.value.length >= 20 || speciesInput.current.value.length >= 40 || zoomInput.current.value.length >= 10)
+        alert("Please shorten your inputs")
+    else if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
     {
         navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/" + zoom +"/" + speciesInput.current.value);
         document.location.reload();
+    }
+    else {
+      alert("Please enter valid lat and long")
     }
   }
 

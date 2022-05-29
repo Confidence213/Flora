@@ -4,6 +4,7 @@ import './Home.css'
 
 function UploadPage() {
   const [showLoc, setShowLoc] = useState(false);
+  const [showLen, setShowLen] = useState(false);
 
   let speciesInput = React.createRef();
   let longInput = React.createRef();
@@ -18,10 +19,22 @@ function UploadPage() {
     if (!(zoomInput.current.value == '' || isNaN(zoomInput.current.value)))
       zoom = parseInt(zoomInput.current.value);
 
-    if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
-        navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/" + zoom +"/" + speciesInput.current.value);
-    else
+    if (longInput.current.value.length >= 20 || latInput.current.value.length >= 20 || speciesInput.current.value.length >= 40 || zoomInput.current.value.length >= 10) 
+    {
+      setShowLen(true);
+      return;
+    }
+
+    setShowLen(false);
+
+    if (longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value))
+    {
       setShowLoc(true);
+      return;
+    }
+
+    setShowLoc(false);
+    navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/" + zoom +"/" + speciesInput.current.value);
   }
 
   const handleLocation = (a) => {
@@ -44,9 +57,10 @@ function UploadPage() {
         <table className="inputs">
           <tr><h3>Find Community Sightings:</h3></tr>
           <tr id="LOCATIONinput">
+          {showLen && <p className="error">Please shorten your inputs</p>}
+          {showLoc && <p className="error">Please enter valid lat and long</p>}
             <input ref={latInput} id="lat" placeholder="*Enter Latitude..." />
             <input ref={longInput} id="long" placeholder="*Enter Longitude..." />
-            {showLoc && <p id='speciesError'>Please enter valid lat and long</p>}
             <input ref={zoomInput} id="zoom" placeholder="zoom level..." />
           </tr>
           

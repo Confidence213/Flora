@@ -18,9 +18,20 @@ class UploadPage extends React.Component {
 
   }
 
-  async handleChange1(event) {    this.setState({species: event.target.value});  }
-  async handleChange2(event) {    this.setState({lat: event.target.value});  }
-  async handleChange3(event) {    this.setState({long: event.target.value});  }
+  async handleChange1(event) {    
+    if (event.target.value.length < 40)
+      this.setState({species: event.target.value});  
+  }
+
+  async handleChange2(event) {    
+    if (event.target.value.length < 20)
+      this.setState({lat: event.target.value});  
+  }
+
+  async handleChange3(event) {    
+    if (event.target.value.length < 20)
+      this.setState({long: event.target.value});  
+  }
 
   latRef = React.createRef();
   longRef = React.createRef();
@@ -88,7 +99,6 @@ class UploadPage extends React.Component {
 
       var postid = await addNewPost(myPost)
       this.button.current.style.background = 'white';
-      alert(postid);
       window.location = "/post/" + postid;
     }
 
@@ -99,6 +109,15 @@ class UploadPage extends React.Component {
   handleImage(e) {    
     if (e.target.files && e.target.files[0]) {
       
+      let file_size = e.target.files[0].size;
+      var file_type = e.target.files[0].type
+      if((file_size > 20000000) || (!(file_type.startsWith("image/"))))
+      {
+        this.setState({showImage: true });
+        return;
+      }
+      this.setState({showImage: false });
+
       let img = e.target.files[0];
 
       var reader = new FileReader();
@@ -124,7 +143,7 @@ class UploadPage extends React.Component {
         <h3>Add Image:</h3>
         <input type="file" onChange={this.handleImage} accept="image/png, image/gif, image/jpeg" />
         <img id="image" src={this.state.image}/>
-        {this.state.showImage && <p id='imageError'>Please enter Image</p>}
+        {this.state.showImage && <p id='imageError'>Please upload image under 20mb</p>}
       </div>
     </tc>
 
@@ -133,12 +152,12 @@ class UploadPage extends React.Component {
         <h3>Species: </h3>
 
         <input type="text" onChange={this.handleChange1}/>
-        {this.state.showSpecies && <p id='speciesError'>Please enter valid Species</p>}
+        {this.state.showSpecies && <p id='speciesError'>Please enter valid Species under 40 characters</p>}
         <h3>Lat and Long: </h3>
         <input type="text" ref={this.latRef} onChange={this.handleChange2} />
 
         <input type="text" ref={this.longRef} onChange={this.handleChange3}/>
-        {this.state.showLocation && <p id='locationError'>Please enter valid Location</p>}
+        {this.state.showLocation && <p id='locationError'>Please enter valid Location under 20 digits</p>}
         <h3></h3>
         <h2></h2>
         <button onClick={this.handleLocation} className="post">Get Current Location</button>

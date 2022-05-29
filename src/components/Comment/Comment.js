@@ -1,7 +1,7 @@
 import React from 'react';
 import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
-import './Comment.css';
+import './Profile.css';
 import { getCommentsByPost, 
   Comment,
   addCommentToPost,
@@ -21,17 +21,8 @@ decrementCommentRating} from '../../firebase/database';
        time: new Date().toISOString()
    },
 ]*/}
-const [list, setList] = useState(null);
 
-    
 
-      const m_list = await getCommentsByPost(props.postid);
-      if(m_list === undefined) {
-        setList(null);
-    }
-    else {
-        setList(Array.from(m_list.values()));
-    }
 
 
 
@@ -40,10 +31,24 @@ const [list, setList] = useState(null);
 class Comments extends React.Component {
     constructor(props) {
       super(props);
-      this.state = {comment: '', isSubmitted: false};
-      
-  
-  
+      this.state = {comment: '', isSubmitted: false, list: null, setList: null};
+
+    
+ 
+
+    async function getList() {
+        const m_list = await getCommentsByPost(props.postid);
+        console.log(Array.from(m_list.values()));
+        if(m_list === undefined) {
+            this.setState({list: null})
+        }
+        else {
+            this.setState({list: (Array.from(m_list.values()))});
+        }
+    }
+
+      this.state = getList();
+
       this.handleChange = this.handleChange.bind(this);
       this.handleCommentSubmit = this.handleCommentSubmit.bind(this);
     }
@@ -57,6 +62,7 @@ class Comments extends React.Component {
       this.setState({isSubmitted: true});
       event.preventDefault();
     }
+    
 render ()
 {
     return (
@@ -76,7 +82,7 @@ render ()
               </div>
             }
             <div>
-              {list.map((comment) => {
+              {this.state.list?.map((comment) => {
                 return ( <span><h4 style={{textAlign:"auto"}}>{comment.user + " " + comment.time}</h4>
                    <p style={{textAlign:"auto"}}>{comment.text}</p>
                 </span>)
@@ -87,6 +93,7 @@ render ()
             <h4 style={{textAlign:"auto"}}>{"bar " + <unix timestamp></unix>}</h4>
             <p style={{textAlign:"auto"}}>{"mee too"}</p>*/}
             </div>
+            
         </div>
     )
 

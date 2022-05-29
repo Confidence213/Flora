@@ -1,13 +1,12 @@
-import React from 'react';
 import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
-import './Profile.css';
+import './Comments.css';
 import { getCommentsByPost, 
   Comment,
   addCommentToPost,
 incrementCommentRating,
 decrementCommentRating} from '../../firebase/database';
-
+ 
 /* pull this from the server, so that we aren't relying on it being hardcoded*/
 {/*let comments = [
   { 
@@ -21,59 +20,54 @@ decrementCommentRating} from '../../firebase/database';
        time: new Date().toISOString()
    },
 ]*/}
-
-
-
-
-
-//let commentsArr = Array.from(comments.keys())
-
-class Comments extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {comment: '', isSubmitted: false, list: null, setList: null};
-
-    
  
 
+ 
+ 
+//let commentsArr = Array.from(comments.keys())
+ 
+function Comments(props) {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [list, setList] = useState(null)
+  const [commentString, setCommentString] = useState("");
+  const [currentComment, setCurrentComment] = useState("");
+ 
     async function getList() {
         const m_list = await getCommentsByPost(props.postid);
         console.log(Array.from(m_list.values()));
         if(m_list === undefined) {
-            this.setState({list: null})
+            setList(null)
         }
         else {
-            this.setState({list: (Array.from(m_list.values()))});
+            setList(Array.from(m_list.values()));
         }
     }
 
-      this.state = getList();
+    useEffect(() => {
+        getList();
+    }, [])
+ 
+ /*
+    handleChange(e) {
+      setCommentString(event.target.value);
+    }
+ 
+    handleCommentSubmit(e) {
+      setIsSubmitted(true);
+      e.preventDefault();
+    }*/
+ 
 
-      this.handleChange = this.handleChange.bind(this);
-      this.handleCommentSubmit = this.handleCommentSubmit.bind(this);
-    }
-  
-    handleChange(event) {
-      const name = event.target.name
-      this.setState({[name]: event.target.value});
-    }
-  
-    handleCommentSubmit(event) {
-      this.setState({isSubmitted: true});
-      event.preventDefault();
-    }
-    
-render ()
-{
     return (
         <div>
             <div className="title" style={{textAlign: "left"}}>Comments</div>
-              {this.state.isSubmitted ? <div>{this.state.comment}</div> :
+              {isSubmitted ? <div>{currentComment}</div> :
               <div className="form">
-                <form onSubmit={this.handleCommentSubmit}>
+                <form onSubmit={(e) => {setIsSubmitted(true);
+      e.preventDefault()}} onChange={e => setCurrentComment(e.target.value)}>
                     <div className="input-container">
                         <label></label>
-                        <input class="comment-input" name="comment" type="text" value={this.state.comment} onChange={this.handleChange} required/>
+                        <input class="comment-input" name="comment" type="text" value={commentString} onChange={(e) =>  {setCommentString(e.target.value);}} required/>
                     </div>
                     <div className="button-container">
                       <input class="comment-input" type="submit" />
@@ -82,8 +76,8 @@ render ()
               </div>
             }
             <div>
-              {this.state.list?.map((comment) => {
-                return ( <span><h4 style={{textAlign:"auto"}}>{comment.user + " " + comment.time}</h4>
+              {list?.map((comment) => {
+                return ( <span><h4 style={{textAlign:"auto"}}>{comment.author + " " + comment.date}</h4>
                    <p style={{textAlign:"auto"}}>{comment.text}</p>
                 </span>)
               })}
@@ -93,12 +87,11 @@ render ()
             <h4 style={{textAlign:"auto"}}>{"bar " + <unix timestamp></unix>}</h4>
             <p style={{textAlign:"auto"}}>{"mee too"}</p>*/}
             </div>
-            
+ 
         </div>
-    )
-
-}
-    
+    );
+ 
 }
 
+ 
 export default Comments;

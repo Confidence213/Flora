@@ -55,7 +55,7 @@ class Login extends React.Component {
                   <label>
                     Password:
                   </label>
-                  <input class="login-input" name="lpassword" type="text" value={this.state.lpassword} onChange={this.handleChange} required/>
+                  <input class="login-input" name="lpassword" type="password" value={this.state.lpassword} onChange={this.handleChange} required/>
                 </div>
                 <div className="button-container">
                   <input class="login-input" type="submit" />
@@ -83,7 +83,7 @@ class Login extends React.Component {
                   <label>
                     Password:
                   </label>
-                  <input class="login-input" name="spassword" type="text" value={this.state.spassword} onChange={this.handleChange} required/>
+                  <input class="login-input" name="spassword" type="password" value={this.state.spassword} onChange={this.handleChange} required/>
                 </div>
                 <div className="button-container">
                   <input class="login-input" type="submit" />

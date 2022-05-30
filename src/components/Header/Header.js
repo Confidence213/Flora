@@ -20,14 +20,12 @@ function Header () {
 
     async function handleLogout(e) {
         e.preventDefault();
-        if (signOutUser())
+        if (signOutUser().then(() => {
+            setTimeout(()=>{getUserInfo()}, 500)
+        }))
         {
             alert("Successfully signed out!");
-            window.location = "/";
         }
-
-        
-        
     }
     
     return (

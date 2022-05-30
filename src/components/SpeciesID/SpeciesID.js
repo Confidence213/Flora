@@ -3,7 +3,10 @@ import { getSpeciesIdentificationByPost,
     toggleIncrementSpeciesIdentificationRating,
     toggleDecrementSpeciesIdentificationRating,
     SpeciesIdentification, 
-    addSpeciesIdentification} from '../../firebase/database';
+    addSpeciesIdentification,
+} from '../../firebase/database';
+
+import { isUserModerator, pinSpeciesIdentification, getSpeciesIdentificationPostMetaData } from '../../firebase/moderation';
 
 import { getUsername } from '../../firebase/account';
 import './SpeciesID.css'
@@ -13,21 +16,33 @@ function SpeciesID(props) {
     const [list, setList] = useState(null);
 
     const [username, setUsername] = useState(null);
+    const [moderator, setModerator] = useState(false);
 
     async function getList() {
-        const m_list = await getSpeciesIdentificationByPost(props.postid);
-        console.log(Array.from(m_list.values()));
-        if(m_list === undefined) {
+        const m_dict = await getSpeciesIdentificationByPost(props.postid);
+        if(m_dict === undefined) {
             setList(null);
+            return;
+        }
+        const m_list = Array.from(m_dict.values());
+        const m_meta = await getSpeciesIdentificationPostMetaData(props.postid);
+        console.log(m_list);
+
+        if(m_meta.pinnedSpeciesIdentification) {
+            const m_new_list = [m_list.find((guess => guess.id === m_meta.pinnedSpeciesIdentification)),
+            ...m_list.filter(guess => guess.id !== m_meta.pinnedSpeciesIdentification)];
+            setList(m_new_list)
         }
         else {
-            setList(Array.from(m_list.values()));
-        }
+            setList(m_list)
+        }      
     }
 
     async function getUserInfo() {
         const m_username = await getUsername();
+        const m_mod = await isUserModerator();
         setUsername(m_username);
+        setModerator(m_mod);
     }
 
     useEffect(() => {
@@ -35,7 +50,6 @@ function SpeciesID(props) {
         getUserInfo();
       }, []);
 
-    let moderator = true;
     return (
         <div class="speciesid-overall">
             <div id="speciesid-list">
@@ -56,8 +70,10 @@ function SpeciesID(props) {
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11015;</button>
                                         {moderator ? 
-                                            <button onClick={() => 
-                                                {dummyModerator(props.postid, guess?.id);
+                                            <button onClick={() => {
+                                                alert("pinning " + guess?.id)
+                                                pinSpeciesIdentification(props.postid, guess?.id)
+                                                .then((n) => {setTimeout(() => {getList()}, 500)});
                                                 }}>M&#10003;</button>
                                         :null}
                                     </td>
@@ -82,6 +98,10 @@ function SpeciesID(props) {
                 value={input} onChange={(e) => setInput(e.target.value)}/>
                 <span id="speciesid-formpad"></span>
                 <button onClick={() => {
+                    if(!username) {
+                        alert("You're not signed in! Sign in to suggest a species.");
+                        return;
+                    }
                     const si = new SpeciesIdentification(input, "", username, new Date().toISOString());
                     console.log(si);
                     setInput("");
@@ -93,10 +113,6 @@ function SpeciesID(props) {
             </form>
         </div>
     );
-}
-
-function dummyModerator(postid, i) {
-    console.log("i overrode");
 }
 
 export default SpeciesID;

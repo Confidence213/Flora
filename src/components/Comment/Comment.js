@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import './Comment.css';
 import { getCommentsByPost, 
   Comment,
-  addCommentToPost,
-incrementCommentRating,
-decrementCommentRating} from '../../firebase/database';
+  addCommentToPost } from '../../firebase/database';
+import { getUsername } from '../../firebase/account';
+
  
 /* pull this from the server, so that we aren't relying on it being hardcoded*/
 {/*let comments = [
@@ -27,10 +27,11 @@ decrementCommentRating} from '../../firebase/database';
 //let commentsArr = Array.from(comments.keys())
  
 function Comments(props) {
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [list, setList] = useState(null)
   const [commentString, setCommentString] = useState("");
   const [currentComment, setCurrentComment] = useState("");
+
+  const [username, setUsername] = useState(null)
  
     async function getList() {
         const m_list = await getCommentsByPost(props.postid);
@@ -43,8 +44,14 @@ function Comments(props) {
         }
     }
 
+    async function getUserInfo() {
+      const m_username = await getUsername();
+      setUsername(m_username);
+  }
+
     useEffect(() => {
         getList();
+        getUserInfo();
     }, [])
  
  /*
@@ -61,10 +68,21 @@ function Comments(props) {
     return (
         <div style={{height: "55vh", overflowY: "auto"}}>
             <div className="title" style={{textAlign: "left"}}>Comments</div>
-              {isSubmitted ? <div>{currentComment}</div> :
               <div className="form">
-                <form onSubmit={(e) => {setIsSubmitted(true);
-      e.preventDefault()}} onChange={e => setCurrentComment(e.target.value)}>
+                <form onSubmit={(e) => {
+                  if(!username) {
+                    alert("You're not signed in! Sign in to add a comment.");
+                    return;
+                  }
+                  const cm = new Comment(currentComment, username, new Date().toISOString());
+                  addCommentToPost(cm, props.postid)
+                  .then(() => {
+                    setTimeout(() => {getList()}, 500)
+                  })
+                  setCurrentComment("");
+                  setCommentString("");
+                  e.preventDefault();
+                }} onChange={e => setCurrentComment(e.target.value)}>
                     <div className="input-container">
                         <label></label>
                         <input class="comment-input" name="comment" type="text" value={commentString} onChange={(e) =>  {setCommentString(e.target.value);}} required/>
@@ -74,7 +92,6 @@ function Comments(props) {
                     </div>
                 </form>
               </div>
-            }
             <div>
               {list?.map((comment) => {
                 return ( <span><h4 style={{textAlign:"auto"}}>{comment.author + " " + comment.date}</h4>

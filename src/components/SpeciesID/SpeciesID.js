@@ -4,6 +4,8 @@ import { getSpeciesIdentificationByPost,
     toggleDecrementSpeciesIdentificationRating,
     SpeciesIdentification, 
     addSpeciesIdentification,
+    hasUserLikedSpeciesIdentification,
+    hasUserDislikedSpeciesIdentification
 } from '../../firebase/database';
 
 import { isUserModerator, pinSpeciesIdentification, getSpeciesIdentificationPostMetaData } from '../../firebase/moderation';
@@ -17,6 +19,10 @@ function SpeciesID(props) {
 
     const [username, setUsername] = useState(null);
     const [moderator, setModerator] = useState(false);
+    const [isPinned, setIsPinned] = useState(false);
+
+    const [voteStyle, setVoteStyle] = useState(null);
+    const [styleValid, setStyleValid] = useState(false);
 
     async function getList() {
         const m_dict = await getSpeciesIdentificationByPost(props.postid);
@@ -29,6 +35,7 @@ function SpeciesID(props) {
         console.log(m_list);
 
         if(m_meta.pinnedSpeciesIdentification) {
+            setIsPinned(true);
             const m_new_list = [m_list.find((guess => guess.id === m_meta.pinnedSpeciesIdentification)),
             ...m_list.filter(guess => guess.id !== m_meta.pinnedSpeciesIdentification)];
             setList(m_new_list)
@@ -45,27 +52,73 @@ function SpeciesID(props) {
         setModerator(m_mod);
     }
 
+    async function getVoteInfo() {
+        if(list === null) {
+            setStyleValid(false);
+            return;
+        }
+        const m_style = await Promise.all(list.map(async (guess, i) => {
+            const m_liked = await hasUserLikedSpeciesIdentification(props.postid, guess?.id);
+            const m_disliked = await hasUserDislikedSpeciesIdentification(props.postid, guess?.id);
+            if(m_liked) {
+                return ({
+                    up: "post-darkbutton",
+                    num: "post-green",
+                    down: null
+                });
+            }
+            else if(m_disliked) {
+                return ({
+                    up: null,
+                    num: "post-red",
+                    down: "post-darkbutton"
+                });
+            }
+            else {
+                return ({
+                    up: null,
+                    num: null,
+                    down: null
+                });
+            }
+        }));
+        setVoteStyle(m_style);
+        
+        setStyleValid(true);
+    }
+
     useEffect(() => {
         getList();
         getUserInfo();
       }, []);
 
+      useEffect(() => {
+        getVoteInfo();
+      }, [list]);
+
     return (
         <div class="speciesid-overall">
             <div id="speciesid-list">
                 {list?.map((guess, i) => {
-                    let highlight = i === 0;
+                    let highlight = function(){
+                        if(i===0) {
+                            if(isPinned || guess?.rating >= 3) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }();
                     return (
                         <div id={highlight? "speciesid-highlight" : "nohighlight"}>
-                            {highlight ? <p>BEST ANSWER</p> : null}
+                            {highlight ? <p>OFFICIAL ANSWER</p> : null}
                             <table class="speciesid-element">
                                 <tr>
                                     <td class="speciesid-td">
-                                        <button onClick={() => {
+                                        <button class={styleValid ? voteStyle[i]?.up : null} onClick={() => {
                                                 toggleIncrementSpeciesIdentificationRating(props.postid, guess?.id, username)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11014;</button>
-                                        <button onClick={() => {
+                                        <button class={styleValid ? voteStyle[i]?.down : null} onClick={() => {
                                             toggleDecrementSpeciesIdentificationRating(props.postid, guess?.id, username)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11015;</button>
@@ -78,7 +131,7 @@ function SpeciesID(props) {
                                         :null}
                                     </td>
                                     <td class="speciesid-td">
-                                        <span class="speciesid-votes">{guess?.rating}</span>
+                                        <span class={"speciesid-votes " + (styleValid? voteStyle[i]?.num : null)}>{guess?.rating}</span>
                                     </td>
                                     <td class="speciesid-td">
                                         <span class="speciesid-species">{guess?.species + guess?.text}</span>

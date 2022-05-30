@@ -13,6 +13,20 @@
     padding-right: 20px;
 }
 
+.post-green {
+    color: darkgreen;
+    font-weight: bold;
+}
+
+.post-red {
+    color: darkred;
+    font-weight: bold;
+}
+
+.post-darkbutton {
+    filter: brightness(75%);
+}
+
 #post-postnum {
     font-size: 20px;
     padding-right: 20px;
@@ -24,6 +38,13 @@
     font-size: 30px;
     padding-right: 20px;
     color: green;
+    display: inline;
+}
+
+#post-postuser {
+    font-size: 20px;
+    padding-right: 20px;
+    color: grey;
     display: inline;
 }
 

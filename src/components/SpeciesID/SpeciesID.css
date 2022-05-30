@@ -11,6 +11,20 @@
     padding-bottom: 10px;
 }
 
+.speciesid-green {
+    color: darkgreen;
+    font-weight: bold;
+}
+
+.speciesid-red {
+    color: darkred;
+    font-weight: bold;
+}
+
+.speciesid-darkbutton {
+    filter: brightness(75%);
+}
+
 .speciesid-species {
     font-size: 18px;
 }

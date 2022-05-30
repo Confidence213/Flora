@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
-import './Comments.css';
+import './Comment.css';
 import { getCommentsByPost, 
   Comment,
   addCommentToPost,
@@ -59,7 +59,7 @@ function Comments(props) {
  
 
     return (
-        <div>
+        <div style={{height: "55vh", overflowY: "auto"}}>
             <div className="title" style={{textAlign: "left"}}>Comments</div>
               {isSubmitted ? <div>{currentComment}</div> :
               <div className="form">

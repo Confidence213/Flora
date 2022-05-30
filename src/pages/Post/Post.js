@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import MapFrame from '../../components/MapFrame/MapFrame';
 import SpeciesID from '../../components/SpeciesID/SpeciesID';
 import NotFound from '../NotFound/NotFound';
+import Comments from '../../components/Comment/Comment';
 import { getPostById,
     toggleIncrementPostRating,
     toggleDecrementPostRating } from '../../firebase/database';
@@ -71,7 +72,7 @@ function Post () {
         <p></p>
         <table class="post-bottom-table">
             <tr>
-                <td class="post-bottom-td">Comment frame go here</td>
+                <td class="post-bottom-td"><Comments postid={postid} /></td>
                 <td class="post-bottom-td">{map}</td>
             </tr>
         </table>

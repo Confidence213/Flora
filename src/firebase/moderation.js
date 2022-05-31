@@ -23,11 +23,16 @@ async function isUserModerator(){
     return profile.isModerator;
 }
 
-async function pinSpeciesIdentification(postId, speciesIdentificationId){
+async function pinSpeciesIdentification(postId, speciesIdentificationId, speciesToPin){
     const speciesIdentificationRef = doc(db, "species_identification", postId);
     await updateDoc(speciesIdentificationRef,{
         pinnedspeciesidentification: speciesIdentificationId,
         moderatorchosen: true,
+    });
+
+    const postRef = doc(db, "posts", postId);
+    await updateDoc(postRef,{
+        species: speciesToPin,
     });
 }
 

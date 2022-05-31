@@ -125,7 +125,7 @@ function SpeciesID(props) {
                                         {moderator ? 
                                             <button onClick={() => {
                                                 alert("pinning " + guess?.id)
-                                                pinSpeciesIdentification(props.postid, guess?.id)
+                                                pinSpeciesIdentification(props.postid, guess?.id, guess?.species)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)});
                                                 }}>M&#10003;</button>
                                         :null}

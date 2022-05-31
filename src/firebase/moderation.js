@@ -25,6 +25,7 @@ async function pinSpeciesIdentification(postId, speciesIdentificationId){
     const speciesIdentificationRef = doc(db, "species_identification", postId);
     await updateDoc(speciesIdentificationRef,{
         pinnedspeciesidentification: speciesIdentificationId,
+        moderatorchosen: true,
     });
 }
 

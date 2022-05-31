@@ -7,12 +7,15 @@ import commentbadge from './comment-dots-solid.svg';
 import likebadge from './medal-solid.svg';
 import identificationbadge from './magnifying-glass-solid.svg';
 import userProfile from './user-solid.svg';
+import { scryRenderedComponentsWithType } from 'react-dom/test-utils';
 
 const Profile = ()=>{
   let { userid } = useParams();
   const [username, setUsername] = useState(null);
   const [profile, setProfile] = useState(null);
   const [curPosts, setPosts] = useState(null);
+
+  const [hoverText, setHoverText] = useState("");
   async function getUserInfo() {
         const m_username = await getUsername();
         setUsername(m_username);
@@ -51,17 +54,24 @@ const Profile = ()=>{
 
   function generateBadges() {
     let finalarr = [];
-    console.log(profile?.totalCommentRating + " + " + profile?.totalPostRating + " + " + profile?.totalSpeciesIdentificationRating)
-    if(profile?.totalCommentRating > 0) {
-      finalarr.push(<img title="total comment rating" alt="total comment rating" src={commentbadge}/>);
+    if(profile?.totalCommentRating > 2) {
+      finalarr.push(<img title="total comment rating" 
+      onMouseOver={()=>{setHoverText("Comment karma exceeds 3 votes")}} 
+      onMouseOut={()=>{setHoverText("")}}
+      alt="total comment rating" src={commentbadge}/>);
     }
-    if(profile?.totalPostRating > 1) {
-      finalarr.push(<img title="total post rating" alt="total post rating" src={likebadge}/>);
+    if(profile?.totalPostRating > 2) {
+      finalarr.push(<img title="total post rating" 
+      onMouseOver={()=>{setHoverText("Post karma exceeds 3 votes")}} 
+      onMouseOut={()=>{setHoverText("")}}
+      alt="total post rating" src={likebadge}/>);
     }
-    if(profile?.totalSpeciesIdentificationRating > 0) {
-      finalarr.push(<img title="total species identification rating" alt="total species identification rating" src={identificationbadge}/>);
+    if(profile?.totalSpeciesIdentificationRating > 2) {
+      finalarr.push(<img title="total species identification rating" 
+      onMouseOver={()=>{setHoverText("Species ID karma exceeds 3 votes")}} 
+      onMouseOut={()=>{setHoverText("")}}
+      alt="total species identification rating" src={identificationbadge}/>);
     }
-    console.log(finalarr.length)
     const listItems = finalarr.map(
       (item) => {
           return (
@@ -72,7 +82,7 @@ const Profile = ()=>{
       return (
         <table>
           <tr>
-          {listItems}
+          {finalarr.length > 0 ? listItems : "Badge shelf is empty :("}
           </tr>
         </table>
       )
@@ -85,7 +95,7 @@ const Profile = ()=>{
   
   return (
     <table style={{margin:"25px 100px"}}> <tr>
-    <th style={{ border:"1px solid grey"}}>
+    <th style={{ border:"1px solid grey", width:"22vw"}}>
       <div>
         <div style={{
           justifyContent:"space around",
@@ -103,6 +113,8 @@ const Profile = ()=>{
             </div>
             <div>
               {badges}
+              <p>{hoverText ? hoverText : 
+               <span style={{fontStyle:"italic"}}>(Hover over badges for details)</span>}</p>
             </div>
           </div>
         </div>

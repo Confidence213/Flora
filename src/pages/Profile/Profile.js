@@ -1,57 +1,109 @@
-import React from 'react'
+import React,{useState, getProfile, useEffect} from 'react'
+import { getUsername } from '../../firebase/account';
+import { getPostsByUsername, getUserProfileStatistics} from '../../firebase/database';
+import { useParams, useNavigate } from 'react-router-dom';
+import PostList from '../../components/PostList/PostList';
+import commentbadge from './comment-dots-solid.svg';
+import likebadge from './medal-solid.svg';
+import identificationbadge from './magnifying-glass-solid.svg';
+import userProfile from './user-solid.svg';
+import { scryRenderedComponentsWithType } from 'react-dom/test-utils';
 
 const Profile = ()=>{
-  let username = 'User1'
-  let creationDate = 'April 27, 2020'
-  let numberPosts = '3 Posts'
-  let profilePic = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png'
-  let badges = [
-    'https://www.iconpacks.net/icons/1/free-badge-icon-1361-thumb.png',
-    'https://d29fhpw069ctt2.cloudfront.net/icon/image/49355/preview.svg',
-    'https://cdn-icons-png.flaticon.com/512/66/66027.png'
-  ]
-  let posts = [
-    'https://i.natgeofe.com/k/ff49e0e1-20b6-4c4b-84c8-4ad196e312e4/eastern-gray-squirrel-closeup_square.jpg',
-    'https://www.allaboutbirds.org/guide/assets/photo/305880301-480px.jpg',
-    'https://i.guim.co.uk/img/media/a6478477c7508115778a257a5011570f66032941/0_85_2048_1229/master/2048.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=afea1b033d076492c371b95545ba089f',
-    'https://i.guim.co.uk/img/media/1e856b908ed2d6bf78bdd31fe9da6ee0d631b2ff/0_42_3000_1800/master/3000.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=32987f1fb0176563c3d108176ca2298e',
-    'https://optimise2.assets-servd.host/steadfast-tern/production/carrion-crow-3.jpg?w=1200&h=900&q=80&fm=webp&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.5&dm=1623059646&s=38926422fb21675a1e6eab9fae1b0ff8'
-  ]
-  let verified = [
-    true,
-    false,
-    true
-  ]
+  let { userid } = useParams();
+  const [username, setUsername] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [curPosts, setPosts] = useState(null);
 
-const isVerified = (i)=>{
-  if (verified[i]){
-  return(
-    <div>
-      <img style={{width:"50px", height: "50px"}}
-      src={'https://i0.wp.com/degreessymbolmac.com/wp-content/uploads/2020/02/check-mark-2025986_1280.png?fit=1280%2C945&ssl=1'}
-      alt="checkmark"/>
-    </div>)}
-  else {
-    return (
-    <div>
-      <img style={{width:"50px", height: "50px"}}
-      src={'https://upload.wikimedia.org/wikipedia/commons/5/53/7_Local_Superclusters_%28blank_2%29.png'}
-      alt="checkmark"/>
-    </div>)
+  const [hoverText, setHoverText] = useState("");
+  async function getUserInfo() {
+        const m_username = await getUsername();
+        setUsername(m_username);
+    }
+  async function getProfileInfo() {
+        const m_profile = await getUserProfileStatistics(username);
+        setProfile(m_profile);
+    }
+  
+  async function getUserPosts() {
+        const m_posts = await getPostsByUsername(username);
+        setPosts(Array.from(m_posts.values()));
   }
-}
 
+  useEffect(() => {
+        if(userid === "me") {
+          getUserInfo();
+        }
+        else {
+          setUsername(userid)
+        }
+  }, []);
+
+  useEffect(() => {
+        if(username !== null) {
+          //fetch profile with(username);
+          getProfileInfo();
+          getUserPosts();
+        }
+  }, [username]);
+
+  const navigate = useNavigate();
+  function handleListClick(i) {
+      navigate("/post/" + curPosts[i]?.id);
+  }
+
+  function generateBadges() {
+    let finalarr = [];
+    if(profile?.totalCommentRating > 2) {
+      finalarr.push(<img title="total comment rating" 
+      onMouseOver={()=>{setHoverText("Comment karma exceeds 3 votes")}} 
+      onMouseOut={()=>{setHoverText("")}}
+      alt="total comment rating" src={commentbadge}/>);
+    }
+    if(profile?.totalPostRating > 2) {
+      finalarr.push(<img title="total post rating" 
+      onMouseOver={()=>{setHoverText("Post karma exceeds 3 votes")}} 
+      onMouseOut={()=>{setHoverText("")}}
+      alt="total post rating" src={likebadge}/>);
+    }
+    if(profile?.totalSpeciesIdentificationRating > 2) {
+      finalarr.push(<img title="total species identification rating" 
+      onMouseOver={()=>{setHoverText("Species ID karma exceeds 3 votes")}} 
+      onMouseOut={()=>{setHoverText("")}}
+      alt="total species identification rating" src={identificationbadge}/>);
+    }
+    const listItems = finalarr.map(
+      (item) => {
+          return (
+          <td> 
+            &#12288;&#12288;{item}&#12288;&#12288;
+          </td>)
+        })
+      return (
+        <table>
+          <tr>
+          {finalarr.length > 0 ? listItems : "Badge shelf is empty :("}
+          </tr>
+        </table>
+      )
+    }
+
+  let creationDate = profile?.accountCreationDate;
+  let numberPosts = profile?.totalPosts + ' Posts'
+  let badges = generateBadges();
+
+  
   return (
     <table style={{margin:"25px 100px"}}> <tr>
-      <th style={{ border:"1px solid grey"}}>
-        <div>
-          <div style={{
-            justifyContent:"space around",
-            margin:"50px 100px",
-            }}>
-            <div>
-              <img style={{width:"160px", height: "160px"}}
-              src={profilePic}
+    <th style={{ border:"1px solid grey", width:"22vw"}}>
+      <div>
+        <div style={{
+          justifyContent:"space around",
+          margin:"50px 100px",
+          }}>
+          <div>
+            <img style={{width:"160px", height: "160px"}}
+              src={userProfile}
               alt="profile avatar"/> 
             </div>
             <div>
@@ -60,110 +112,19 @@ const isVerified = (i)=>{
               <h4 style={{textAlign:"center"}}>Account Created: {creationDate}</h4>
             </div>
             <div>
-              <table><tr>
-                <th>
-                  <div>
-                  <img style={{width:"50px", height: "50px"}}
-              src={badges[0]}
-              alt="badge"/>
-                  </div>
-                </th>
-                <th>
-                  <div>
-                  <img style={{width:"50px", height: "50px"}}
-              src={badges[1]}
-              alt="badge"/>
-                  </div>
-                </th>
-                <th>
-                  <div>
-                  <img style={{width:"50px", height: "50px"}}
-              src={badges[2]}
-              alt="badge"/>
-                  </div>
-                </th>
-              </tr></table>
+              {badges}
+              <p>{hoverText ? hoverText : 
+               <span style={{fontStyle:"italic"}}>(Hover over badges for details)</span>}</p>
             </div>
           </div>
         </div>
       </th>
-      <th style={{ border:"1px solid grey"}}>
-        <table style={{margin:"25px 50px", border:"1px solid grey"}}><tr>
-          <table style={{border:"1px solid grey"}}><th>
-            {isVerified(0)}
-            </th>
-            <th>
-            <div>
-              <h3>Squirrel</h3>
-              <h6>1242 Gayley Street, LA, 92222</h6>
-            </div>
-            </th>
-            <th>
-              <div style={{
-            justifyContent:"space around",
-            margin:"0px 100px",
-            }}>
-                <div>
-                  <img style={{width:"100px", height: "100px"}}
-                  src={posts[0]}
-                  alt="post"/>
-                </div>
-              </div>
-            </th>
-          </table>
-          </tr>
-          <tr style={{ border:"1px solid grey"}}>
-          <table style={{border:"1px solid grey"}}><th>
-          {isVerified(1)}
-            </th>
-            <th>
-            <div>
-              <h3>Sparrow</h3>
-              <h6>1232 Gayley Street, LA, 92222</h6>
-            </div>
-            </th>
-            <th>
-              <div style={{
-            justifyContent:"space around",
-            margin:"0px 100px",
-            }}>
-                <div>
-                  <img style={{width:"100px", height: "100px"}}
-                  src={posts[1]}
-                  alt="post"/>
-                </div>
-              </div>
-            </th>
-          </table>
-          </tr>
-          <tr style={{ border:"1px solid grey"}}>
-          <table style={{border:"1px solid grey"}}><th>
-          {isVerified(2)}
-            </th>
-            <th>
-            <div>
-              <h3>Rabbit</h3>
-              <h6>1242 Gayley Street, LA, 92222</h6>
-            </div>
-            </th>
-            <th>
-              <div style={{
-            justifyContent:"space around",
-            margin:"0px 100px",
-            }}>
-                <div>
-                  <img style={{width:"100px", height: "100px"}}
-                  src={posts[2]}
-                  alt="post"/>
-                </div>
-              </div>
-            </th>
-          </table>
-          </tr>
-        </table>
+      <th style={{ border:"1px solid grey" }}>
+        <PostList list={curPosts} listClick={handleListClick}/>
       </th>
     </tr></table>
   )
 }
 
 export default Profile;
+

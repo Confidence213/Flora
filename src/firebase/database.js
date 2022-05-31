@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy, deleteField } from "firebase/firestore"; 
+import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy, deleteField, limit } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {getUserId} from "./account.js"
 const storage = getStorage(app);
@@ -639,6 +639,40 @@ async function getVotedSpeciesIdentifications(postId){
         currentUserVotedSpeciesIdentifications = new Map(Object.entries(docSnap.data().votedspeciesidentifications[postId]));
     }
     votedSpeciesIdentificationsPost = postId;
+}
+
+
+async function autoUpdateSpecies(postId){
+    const speciesIdentificationMetaDataRef = doc(db, "species_identification", postId);
+    const postRef = doc(db, "posts", postId);
+    const docSnap = await getDoc(speciesIdentificationMetaDataRef);
+    if(docSnap.data().moderatorchosen === true){ return; }
+
+    const ref = collection(db, "species_identification/" + postId + "/comments");
+    const q = query(ref, orderBy("rating","desc"), limit(1));
+    const querySnapshot = await getDocs(q);
+    
+    let isThresholdReached = false;
+    querySnapshot.forEach((doc) => {
+        if(doc.data().rating >= 3){
+            isThresholdReached = true;
+            updateDoc(speciesIdentificationMetaDataRef,{
+                pinnedspeciesidentification: doc.id,
+            });
+            updateDoc(postRef,{
+                species: doc.data().species,
+            });
+        }
+    });
+
+    if(!isThresholdReached){
+        await updateDoc(postRef,{
+            species: docSnap.data().originalspecies,
+        });
+        await updateDoc(speciesIdentificationMetaDataRef,{
+            pinnedspeciesidentification: "",
+        });
+    }
 }
 
 export {Post, Comment, SpeciesIdentification, 

@@ -1,6 +1,6 @@
 import app from "./firebaseSetup.js"
 import { getFirestore, doc, updateDoc, getDoc} from "firebase/firestore"; 
-import { getUserProfileStatistics } from "./database.js";
+import { getUserProfileStatistics, autoUpdateSpecies } from "./database.js";
 import { getUsername } from "./account.js";
 const db = getFirestore(app);
 
@@ -36,6 +36,15 @@ async function pinSpeciesIdentification(postId, speciesIdentificationId, species
     });
 }
 
+async function unpinSpeciesIdentification(postId){
+    const speciesIdentificationRef = doc(db, "species_identification", postId);
+    await updateDoc(speciesIdentificationRef,{
+        moderatorchosen: false,
+    });
+
+    await autoUpdateSpecies(postId);
+}
+
 async function setStatus(postId, status){
     const speciesIdentificationRef = doc(db, "species_identification", postId);
     await updateDoc(speciesIdentificationRef,{
@@ -49,4 +58,4 @@ async function getSpeciesIdentificationPostMetaData(postId){
     return new SpeciesIdentificationPostMetaData(docSnap.data().pinnedspeciesidentification, docSnap.data().status, docSnap.data().moderatorchosen, docSnap.data().originalspecies);
 }
 
-export{isUserModerator, pinSpeciesIdentification, setStatus, getSpeciesIdentificationPostMetaData}
+export{isUserModerator, pinSpeciesIdentification, unpinSpeciesIdentification, setStatus, getSpeciesIdentificationPostMetaData}

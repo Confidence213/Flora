@@ -684,5 +684,6 @@ export {Post, Comment, SpeciesIdentification,
     //These following functions have a second/third parameter *Author which is the author of the post/comment/species identification. This parameter is here to reduce the amount of
     //communication needed to the cloud because these functions are assumed to only be used once you already have gotten data from the post document
     //which includes the post author.
-    toggleIncrementPostRating, toggleDecrementPostRating, toggleIncrementCommentRating, toggleDecrementCommentRating, toggleIncrementSpeciesIdentificationRating, toggleDecrementSpeciesIdentificationRating
+    toggleIncrementPostRating, toggleDecrementPostRating, toggleIncrementCommentRating, toggleDecrementCommentRating, toggleIncrementSpeciesIdentificationRating, toggleDecrementSpeciesIdentificationRating,
+    autoUpdateSpecies, //WARNING: THIS FUNCTION SHOULD ONLY BE IMPORTED IN moderation.js
     };

@@ -497,6 +497,7 @@ async function toggleIncrementSpeciesIdentificationRating(postId, speciesIdentif
         })
     });
 
+    await autoUpdateSpecies(postId);
     return true;
 }
 
@@ -539,6 +540,7 @@ async function toggleDecrementSpeciesIdentificationRating(postId, speciesIdentif
         })
     });
 
+    await autoUpdateSpecies(postId);
     return true;
 }
 

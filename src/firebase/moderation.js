@@ -7,9 +7,10 @@ const db = getFirestore(app);
 var profile;
 
 class SpeciesIdentificationPostMetaData{
-    constructor(pinnedSpeciesIdentification, status){
+    constructor(pinnedSpeciesIdentification, status, moderatorChosen){
         this.pinnedSpeciesIdentification = pinnedSpeciesIdentification;
         this.status = status;
+        this.moderatorChosen = moderatorChosen;
     }
 }
 
@@ -39,7 +40,7 @@ async function setStatus(postId, status){
 async function getSpeciesIdentificationPostMetaData(postId){
     const speciesIdentificationRef = doc(db, "species_identification", postId);
     const docSnap = await getDoc(speciesIdentificationRef);
-    return new SpeciesIdentificationPostMetaData(docSnap.data().pinnedspeciesidentification, docSnap.data().status);
+    return new SpeciesIdentificationPostMetaData(docSnap.data().pinnedspeciesidentification, docSnap.data().status, docSnap.data().moderatorchosen);
 }
 
 export{isUserModerator, pinSpeciesIdentification, setStatus, getSpeciesIdentificationPostMetaData}

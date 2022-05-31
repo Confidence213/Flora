@@ -15,7 +15,8 @@ function PostList(props) {
                     <table class="postlist-entry" onClick={() => {props.listClick(i)}}>
                         <tr>
                             <td class="postlist-td">
-                                <p class="postlist-title">{post?.title + post?.species}</p>
+                                <p class="postlist-title">{post?.species}
+                                <span class="postlist-votes">{" " + post?.rating + " votes"}</span></p>
                                 <p class="postlist-subtitle">{"by " + post?.author + " on " + (post?.date ?? "unknown date")}</p>
                             </td>
                             <td class="postlist-td">

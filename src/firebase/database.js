@@ -156,7 +156,9 @@ async function addNewPost(post){
     const speciesIdentificationRef = doc(db, "species_identification", newPostRef.id);
     await setDoc(speciesIdentificationRef,{
         status: false,
+        moderatorchosen: false,
         pinnedspeciesidentification: "",
+        originalspecies: post.species,
     });
 
     return newPostRef.id;

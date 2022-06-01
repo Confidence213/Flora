@@ -78,6 +78,7 @@ export async function getUsername() {
 
 export async function signOutUser() {
   signOut(auth).then(function() {
+    window.location.reload();
     return true;
   }, function(error) {
     return false;

@@ -11,6 +11,11 @@ function Map () {
   let defaultCenter = [lat ?? 34.072830, lng ?? -118.451346];
   let defaultZoom = zm ?? 9;
 
+  const validZoomInputs = Array.from(Array(19).keys()).map(String)
+  const [showZoom, setShowZoom] = useState(false);
+  const [showLoc, setShowLoc] = useState(false);
+  const [showLen, setShowLen] = useState(false);
+
   let speciesInput = React.createRef();
   let longInput = React.createRef();
   let latInput = React.createRef();
@@ -24,6 +29,7 @@ function Map () {
   
   const [clickIndex, setClickIndex] = useState(null);
   const [clickUpdate, setClickUpdate] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -84,19 +90,41 @@ function Map () {
 
   const handleClick = (a) => {
     var zoom = 9;
-    if (!(zoomInput.current.value == '' || isNaN(zoomInput.current.value)))
+    var exit = false;
+
+    if (showZoom)
+      return;
+
+    if (!zoomInput.current.value == '')
       zoom = parseInt(zoomInput.current.value);
 
-    if (longInput.current.value.length >= 20 || latInput.current.value.length >= 20 || speciesInput.current.value.length >= 40 || zoomInput.current.value.length >= 10)
-        alert("Please shorten your inputs")
-    else if (!(longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)))
-    {
-        navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/" + zoom +"/" + speciesInput.current.value);
-        document.location.reload();
+    if (longInput.current.value.length >= 20 || latInput.current.value.length >= 20 || speciesInput.current.value.length >= 40 || zoomInput.current.value.length >= 10) {
+      setShowLen(true);
+      exit = true;
     }
-    else {
-      alert("Please enter valid lat and long")
+    else
+      setShowLen(false);
+
+    if (longInput.current.value == '' || latInput.current.value == '' || isNaN(longInput.current.value) || isNaN(latInput.current.value)) {
+      setShowLoc(true);
+      exit = true;
     }
+    else
+      setShowLoc(false);
+
+    if (exit)
+      return;
+
+    navigate("/map/" + latInput.current.value + "/" + longInput.current.value + "/" + zoom +"/" + speciesInput.current.value);
+    document.location.reload();
+  }
+
+  async function handleZoomChange(e) {   
+    //alert(validZoomInputs.indexOf(e.target.value) >= 0); //returns true if zoom input is 0-18 integer (though, in string form)
+    if (!e.target.value == '')
+      setShowZoom(!(validZoomInputs.indexOf(e.target.value) >= 0))
+    else
+      setShowZoom(false)
   }
 
   const handleLocation = (a) => {
@@ -117,13 +145,19 @@ function Map () {
     <div>
       <div class="searchBar">
         <table class="searchTable"><tr>
+          {showLen && <p className="error">Please shorten your inputs</p>}
+          
             <th><input ref={latInput} class="input" placeholder="*Latitude..." /></th>
             <th><input ref={longInput} class="input" placeholder="*Longitude..." /></th>
-            <th><input ref={zoomInput} class ="input" placeholder="zoom level..." /></th>
+            <th><input ref={zoomInput} class ="input" onChange={handleZoomChange} placeholder="zoom level..." /></th>
+            
             <th><input class="input"  ref={speciesInput} placeholder="Species..." /></th>
             <th><button onClick={handleLocation} className="button" ref={button}>Current Location</button></th>
             <th><button onClick={handleClick} className="button">SEARCH</button></th>
         </tr></table>
+        {showLoc && <p className="error">Please enter valid lat and long</p>}
+        {showZoom && <p className="error">Please enter int between 0-18</p>}
+        {showLen && <p className="error">Please shorten your inputs</p>}
         <h2></h2>
       </div> 
   

@@ -32,7 +32,6 @@ function SpeciesID(props) {
         }
         const m_list = Array.from(m_dict.values());
         const m_meta = await getSpeciesIdentificationPostMetaData(props.postid);
-        console.log(m_list);
 
         if(m_meta.pinnedSpeciesIdentification) {
             setIsPinned(true);
@@ -156,7 +155,6 @@ function SpeciesID(props) {
                         return;
                     }
                     const si = new SpeciesIdentification(input, "", username, new Date().toISOString());
-                    console.log(si);
                     setInput("");
                     addSpeciesIdentification(si, props.postid)
                     .then(() => {

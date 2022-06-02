@@ -94,7 +94,22 @@ function UploadPage() {
       var today = new Date();
       var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-      var myPost = new Post(username, "title", "description", species, imageFile, lat, long, date);
+      let latParsed;
+      if(typeof lat === 'string'){
+        latParsed = parseFloat(lat);
+      }
+      else{
+        latParsed = lat;
+      }
+      let longParsed;
+      if(typeof long === 'string'){
+        longParsed = parseFloat(long)
+      }
+      else{
+        longParsed = long;
+      }
+
+      var myPost = new Post(username, "title", "description", species, imageFile, latParsed, longParsed, date);
       var postid = await addNewPost(myPost)
       button.current.style.background = 'white';
       //window.location = "/post/" + postid;

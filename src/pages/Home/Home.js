@@ -1,8 +1,14 @@
 import { Link, useNavigate} from 'react-router-dom'
-import React, {useState} from 'react';
+import { getAllPosts, getPostsByLocation } from '../../firebase/database';
+import PostList from '../../components/PostList/PostList';
+import React, {useEffect, useState} from 'react';
 import './Home.css'
+import { list } from 'firebase/storage';
 
-function UploadPage() {
+function Home() {
+
+
+  const [first5Posts, setPosts] = useState(null);
   const [showLoc, setShowLoc] = useState(false);
   const [showLen, setShowLen] = useState(false);
 
@@ -13,6 +19,28 @@ function UploadPage() {
   let button = React.createRef();
 
   const navigate = useNavigate();
+
+
+  async function getPosts() {
+    const m_posts = await getPostsByLocation(180, -180, 90, -90);
+    if(m_posts === undefined)
+    {
+      setPosts(null)
+    }
+    else {
+      setPosts(Array.from(m_posts.values()).slice(0, 5));
+    }
+}
+
+
+useEffect(() => {
+  getPosts();}, []
+);
+
+
+
+
+
 
   const handleClick = (a) => {
     var zoom = 9;
@@ -73,15 +101,19 @@ function UploadPage() {
       </div>
       <h2></h2>
       <div className="gallery">
-        <h3 id="title"> This Week's Gallery</h3> <h2></h2>
+        <h3 id="title"> Discover Sightings</h3> <h2></h2>
+        {first5Posts?.map((post) => {
+          return (<Link to={"/post/" + post.id}><img class="img" src={post.image}/></Link>);
+        })}
+        {/*<PostList list={curPosts} listClick={handleListClick}/>
         <Link to="/post/UpkFbAUlB9sfUCm5MLC1"><img class="img" src="https://media.thetab.com/blogs.dir/179/files/2017/04/matts-pic-600x284.jpg"/></Link>
         <Link to="/post/dwk6zCvUuiPR3iU1Bi0y"><img class="img" src="https://i.imgur.com/dligDo7.jpg"/></Link>
         <Link to="/post/14seV2gHyOcd58gmPdVh"><img class="img" src="https://i.imgur.com/GLpoJXA.jpg"/></Link>
         <Link to="/post/yEefsX9HRCwJXxvnWsDL"><img class="img" src="https://i.redd.it/oxqwjebtg5g81.jpg"/></Link>
-        <Link to="/post/GAqIP8UR7MyL2nDpjjBs"><img class="img" src="https://i.redd.it/f4vi3qlv24t71.jpg"/></Link>
+  <Link to="/post/GAqIP8UR7MyL2nDpjjBs"><img class="img" src="https://i.redd.it/f4vi3qlv24t71.jpg"/></Link>*/}
       </div>
     </div>
   );
 }
 
-export default UploadPage;
+export default Home;

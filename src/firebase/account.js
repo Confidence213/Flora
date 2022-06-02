@@ -78,6 +78,7 @@ export async function getUsername() {
 
 export async function signOutUser() {
   signOut(auth).then(function() {
+    window.location.reload();
     return true;
   }, function(error) {
     return false;
@@ -92,6 +93,7 @@ export async function getUserId(){
     return null;
 }
 
+// Credit for code by Nicholas Tower: https://stackoverflow.com/a/49326537
 export const userLoggedIn = () => {
   return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(user => {

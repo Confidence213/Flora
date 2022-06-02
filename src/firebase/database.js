@@ -1,5 +1,5 @@
 import app from "./firebaseSetup.js"
-import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy, deleteField, limit } from "firebase/firestore"; 
+import { getFirestore, collection, setDoc, doc, getDoc, getDocs, query, where, increment, updateDoc, orderBy, deleteField, limit, runTransaction  } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {getUserId} from "./account.js"
 const storage = getStorage(app);
@@ -303,36 +303,43 @@ async function toggleIncrementPostRating(postId, postAuthor){
     let path = 'votedposts.' + postId;
     if(repeatVoteCheck){
         deltaRating = -1;
-
-        currentUserVotedPosts.delete(postId);
-        await updateDoc(userRef,{
-            [path]: deleteField(),
-        });
     }
     else{
-        repeatVoteCheck = await hasUserDislikedPost(postId);
-        deltaRating = (repeatVoteCheck)? 2: 1;
-
-        currentUserVotedPosts.set(postId, true);
-        await updateDoc(userRef,{
-            [path]: true,
-        });
+        let repeatVoteCheckOpp = await hasUserDislikedPost(postId);
+        deltaRating = (repeatVoteCheckOpp)? 2: 1;
     }
 
     const ref = doc(collection(db, 'posts'), postId);
-    await updateDoc(ref,{
-        rating: increment(deltaRating)
+    await runTransaction(db, async (transaction) => {
+        transaction.update(ref,{
+            rating: increment(deltaRating)
+        });
     });
 
     const authorRef = collection(db, "users");
     const q = query(authorRef, where("username", "==", postAuthor));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-        updateDoc(doc.ref,{
-            totalpostrating: increment(deltaRating)
-        })
+        runTransaction(db, async (transaction) => {
+            transaction.update(doc.ref,{
+                totalpostrating: increment(deltaRating)
+            });
+        });
     });
 
+    if(repeatVoteCheck){
+        currentUserVotedPosts.delete(postId);
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
+    }
+    else{
+        currentUserVotedPosts.set(postId, true);
+        await updateDoc(userRef,{
+            [path]: true,
+        });
+    }
+    
     return true;
 }
 
@@ -344,35 +351,42 @@ async function toggleDecrementPostRating(postId, postAuthor){
     let path = 'votedposts.' + postId;
     if(repeatVoteCheck){
         deltaRating = 1;
-
-        currentUserVotedPosts.delete(postId);
-        await updateDoc(userRef,{
-            [path]: deleteField(),
-        });
     }
     else{
-        repeatVoteCheck = await hasUserLikedPost(postId);
-        deltaRating = (repeatVoteCheck)? -2: -1;
-
-        currentUserVotedPosts.set(postId, false);
-        await updateDoc(userRef,{
-            [path]: false,
-        });
+        let repeatVoteCheckOpp = await hasUserLikedPost(postId);
+        deltaRating = (repeatVoteCheckOpp)? -2: -1;
     }   
     
     const ref = doc(collection(db, 'posts'), postId);
-    await updateDoc(ref,{
-        rating: increment(deltaRating)
+    await runTransaction(db, async (transaction) => {
+        transaction.update(ref,{
+            rating: increment(deltaRating)
+        });
     });
 
     const authorRef = collection(db, "users");
     const q = query(authorRef, where("username", "==", postAuthor));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-        updateDoc(doc.ref,{
-            totalpostrating: increment(deltaRating)
-        })
+        runTransaction(db, async (transaction) => {
+            transaction.update(doc.ref,{
+                totalpostrating: increment(deltaRating)
+            });
+        });
     });
+
+    if(repeatVoteCheck){
+        currentUserVotedPosts.delete(postId);
+        await updateDoc(userRef,{
+            [path]: deleteField(),
+        });
+    }
+    else{
+        currentUserVotedPosts.set(postId, false);
+        await updateDoc(userRef,{
+            [path]: false,
+        });
+    }
 
     return true;
 }

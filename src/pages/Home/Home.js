@@ -1,6 +1,7 @@
 import { Link, useNavigate} from 'react-router-dom'
 import { getAllPosts, getPostsByLocation } from '../../firebase/database';
 import PostList from '../../components/PostList/PostList';
+import Map from "./map.svg";
 import React, {useEffect, useState} from 'react';
 import './Home.css'
 import { list } from 'firebase/storage';
@@ -106,7 +107,7 @@ function Home() {
           <button onClick={handleClick} className="search">SEARCH</button></tr>
           <Link to="/map">Or Explore Map</Link>
         </table>
-        <img id="map" src="https://svgshare.com/i/gvs.svg" alt="graphic_map"/>
+        <img id="map" src={Map} alt="graphic_map"/>
       </div>
       <h2></h2>
       <div className="gallery">

@@ -481,35 +481,46 @@ async function toggleIncrementSpeciesIdentificationRating(postId, speciesIdentif
 
     if(repeatVoteCheck){
         deltaRating = -1;
-
-        currentUserVotedSpeciesIdentifications.delete(speciesIdentificationId);
-        await updateDoc(userRef,{
-            [path]: deleteField(),
-        });
     }
     else{
-        repeatVoteCheck = await hasUserDislikedSpeciesIdentification(postId, speciesIdentificationId);
-        deltaRating = (repeatVoteCheck)? 2: 1;
-
-        currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, true);
-        await updateDoc(userRef,{
-            [path]: true,
-        });
+        let repeatVoteCheckOpp = await hasUserDislikedSpeciesIdentification(postId, speciesIdentificationId);
+        deltaRating = (repeatVoteCheckOpp)? 2: 1;
     }
 
     const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
-    updateDoc(ref,{
-        rating: increment(deltaRating)
+    await runTransaction(db, async (transaction) => {
+        transaction.update(ref,{
+            rating: increment(deltaRating)
+        });
     });
 
     const authorRef = collection(db, "users");
     const q = query(authorRef, where("username", "==", speciesIdentificationAuthor));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-        updateDoc(doc.ref,{
-            totalspeciesidentificationrating: increment(deltaRating)
-        })
+        runTransaction(db, async (transaction) => {
+            transaction.update(doc.ref,{
+                totalspeciesidentificationrating: increment(deltaRating)
+            });
+        });
     });
+
+    if(repeatVoteCheck){
+        currentUserVotedSpeciesIdentifications.delete(speciesIdentificationId);
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: deleteField(),
+            });
+        });
+    }
+    else{
+        currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, true);
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: true,
+            });
+        });
+    }
 
     await autoUpdateSpecies(postId);
     return true;
@@ -524,36 +535,47 @@ async function toggleDecrementSpeciesIdentificationRating(postId, speciesIdentif
 
     if(repeatVoteCheck){
         deltaRating = 1;
-
-        currentUserVotedSpeciesIdentifications.delete(speciesIdentificationId);
-        await updateDoc(userRef,{
-            [path]: deleteField(),
-        });
     }
     else{
-        repeatVoteCheck = await hasUserLikedSpeciesIdentification(postId, speciesIdentificationId);
-        deltaRating = (repeatVoteCheck)? -2: -1;
-
-        currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, false);
-        await updateDoc(userRef,{
-            [path]: false,
-        });
+        let repeatVoteCheckOpp = await hasUserLikedSpeciesIdentification(postId, speciesIdentificationId);
+        deltaRating = (repeatVoteCheckOpp)? -2: -1;
     }
 
     const ref = doc(collection(db, "species_identification/" + postId + "/comments"), speciesIdentificationId);
-    updateDoc(ref,{
-        rating: increment(deltaRating)
+    await runTransaction(db, async (transaction) => {
+        transaction.update(ref,{
+            rating: increment(deltaRating)
+        });
     });
 
     const authorRef = collection(db, "users");
     const q = query(authorRef, where("username", "==", speciesIdentificationAuthor));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-        updateDoc(doc.ref,{
-            totalspeciesidentificationrating: increment(deltaRating)
-        })
+        runTransaction(db, async (transaction) => {
+            transaction.update(doc.ref,{
+                totalspeciesidentificationrating: increment(deltaRating)
+            });
+        });
     });
 
+    if(repeatVoteCheck){
+        currentUserVotedSpeciesIdentifications.delete(speciesIdentificationId);
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: deleteField(),
+            });
+        });
+    }
+    else{
+        currentUserVotedSpeciesIdentifications.set(speciesIdentificationId, false);
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: false,
+            });
+        });
+    }
+    
     await autoUpdateSpecies(postId);
     return true;
 }

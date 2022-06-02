@@ -115,11 +115,11 @@ function SpeciesID(props) {
                                 <tr>
                                     <td class="speciesid-td">
                                         <button class={styleValid ? voteStyle[i]?.up : null} onClick={() => {
-                                                toggleIncrementSpeciesIdentificationRating(props.postid, guess?.id, username)
+                                                toggleIncrementSpeciesIdentificationRating(props.postid, guess?.id, guess?.author)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11014;</button>
                                         <button class={styleValid ? voteStyle[i]?.down : null} onClick={() => {
-                                            toggleDecrementSpeciesIdentificationRating(props.postid, guess?.id, username)
+                                            toggleDecrementSpeciesIdentificationRating(props.postid, guess?.id, guess?.author)
                                                 .then((n) => {setTimeout(() => {getList()}, 500)})
                                             }}>&#11015;</button>
                                         {moderator ? 

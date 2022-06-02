@@ -195,7 +195,7 @@ async function getPostById(id){
 //Returns a map of id (string) -> Post objects
 async function getAllPosts(){
     const ref = collection(db, "posts").withConverter(postConverter);
-    const q = query(ref, orderBy("rating","desc"));
+    const q = query(ref, orderBy("rating","desc"), limit(5));
     const querySnapshot = await getDocs(q);
     let map = new Map();
     querySnapshot.forEach((doc) => {

@@ -1,122 +1,121 @@
-import React from 'react';
+import React, {useState} from 'react';
+import { useNavigate} from 'react-router-dom'
 import './Upload.css'
 import {Post, addNewPost} from "../../firebase/database"
 import {userLoggedIn, getUsername} from "../../firebase/account"
 
-class UploadPage extends React.Component {
-  constructor(props) {
-    super(props);
+function UploadPage() {
 
-    this.state = {loaded: false, species: '', lat: '', long: '', image: null, imageFile: null, showSpecies: false, showLocation: false, showImage: false, map: null, loggedIn: true};
+  const [species, setSpecies] = useState('');
+  const [lat, setLat] = useState('');
+  const [long, setLong] = useState('');
+  const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [showSpecies, setShowSpecies] = useState(false);
+  const [showLocation, setShowLocation] = useState(false);
+  const [showImage, setShowImage] = useState(false);
+  const [map, setMap] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(true);
 
-    this.handleChange1 = this.handleChange1.bind(this);
-    this.handleChange2 = this.handleChange2.bind(this);
-    this.handleChange3 = this.handleChange3.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleImage = this.handleImage.bind(this);
-    this.handleLocation = this.handleLocation.bind(this); 
+  let latRef = React.createRef();
+  let longRef = React.createRef();
+  let button = React.createRef();
 
+  const navigate = useNavigate();
+
+  async function handleChange1(e) {    
+    if (e.target.value.length < 40)
+    setSpecies(e.target.value)
   }
 
-  async handleChange1(event) {    
-    if (event.target.value.length < 40)
-      this.setState({species: event.target.value});  
+  async function handleChange2(e) {    
+    if (e.target.value.length < 20)
+      setLat(e.target.value)
   }
 
-  async handleChange2(event) {    
-    if (event.target.value.length < 20)
-      this.setState({lat: event.target.value});  
+  async function handleChange3(e) {    
+    if (e.target.value.length < 20)
+      setLong(e.target.value)
   }
 
-  async handleChange3(event) {    
-    if (event.target.value.length < 20)
-      this.setState({long: event.target.value});  
-  }
-
-  latRef = React.createRef();
-  longRef = React.createRef();
-  button = React.createRef();
-
-  async componentDidMount(){
-    const m_signedIn = await userLoggedIn();
-    this.setState({loaded: true, loggedIn: m_signedIn});
-  }
-
-  async handleLocation() {
-    if (this.state.loaded)
-    { 
-      if (!"geolocation" in navigator) {
-        alert("error: geological data not available")
-      }
-      else {
-        navigator.geolocation.getCurrentPosition( (position) => {    
-          this.setState({lat: position.coords.latitude });
-          this.setState({long: position.coords.longitude });
-          this.latRef.current.value = position.coords.latitude;
-          this.longRef.current.value = position.coords.longitude;
-        });
-      }
+  async function handleLocation() {
+    if (!"geolocation" in navigator) {
+      alert("error: geological data not available")
+    }
+    else {
+      navigator.geolocation.getCurrentPosition( (position) => {    
+        setLat(position.coords.latitude)
+        setLong(position.coords.longitude)
+        latRef.current.value = position.coords.latitude;
+        longRef.current.value = position.coords.longitude;
+      });
     }
   }
 
-  async handleSubmit(event) {
-
+  async function handleSubmit(event) {
     var canPost = true;
+    const m_signedIn = await userLoggedIn();
+    setLoggedIn(m_signedIn)
 
-    if (this.state.species == '')
+    if (!m_signedIn){
+      alert("Please sign in to post")
+      navigate("/login");
+      return;
+    }
+    if (species == '')
     {
-      this.setState({showSpecies: true });
+      setShowSpecies(true);
       canPost = false;
     }
     else
-      this.setState({showSpecies: false });
+      setShowSpecies(false);
 
-    if (this.state.lat == '' || this.state.long == '' || isNaN(this.state.lat) || isNaN(this.state.long))
+    if (lat == '' || long == '' || isNaN(lat) || isNaN(long))
     {
-      this.setState({showLocation: true });
+      setShowLocation(true);
       canPost = false;
     }
     else
-      this.setState({showLocation: false });
+      setShowLocation(false);
 
-    if (this.state.image == null)
+    if (image == null)
     {
-      this.setState({showImage: true });
+      setShowImage(true);
       canPost = false;
     }
     else
-      this.setState({showImage: false });
+      setShowImage(false);
 
     if (canPost == true)
     {
-      this.button.current.style.background = 'grey';
+      button.current.style.background = 'grey';
       const username = await getUsername();
 
       var today = new Date();
       var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-      var myPost = new Post(username, "title", "description", this.state.species, this.state.imageFile, this.state.lat, this.state.long, date);
-
+      var myPost = new Post(username, "title", "description", species, imageFile, lat, long, date);
       var postid = await addNewPost(myPost)
-      this.button.current.style.background = 'white';
-      window.location = "/post/" + postid;
+      button.current.style.background = 'white';
+      //window.location = "/post/" + postid;
+      navigate("/post/" + postid);
     }
 
-    //alert(this.state.species + this.state.location);
+    //alert(species + location);
     event.preventDefault();
   }
 
-  handleImage(e) {    
+  async function handleImage(e) {    
     if (e.target.files && e.target.files[0]) {
       
       let file_size = e.target.files[0].size;
       var file_type = e.target.files[0].type
       if((file_size > 20000000) || (!(file_type.startsWith("image/"))))
       {
-        this.setState({showImage: true });
+        setShowImage(true);
         return;
       }
-      this.setState({showImage: false });
+      setShowImage(false);
 
       let img = e.target.files[0];
 
@@ -124,26 +123,22 @@ class UploadPage extends React.Component {
       var file = document.querySelector('input[type=file]').files[0];
       reader.readAsDataURL(file);
 
-      this.setState({
-        imageFile: file,
-        image: URL.createObjectURL(img)
-      });
-      }
+      setImageFile(file);
+      setImage(URL.createObjectURL(img));
   }
+}
 
-  render() {
+
   return (
 
   <div>
-    {this.state.loggedIn ?
-          
-    <table className="page">
+  <table className="page">
     <tc>
       <div className="image_input">
         <h3>Add Image:</h3>
-        <input type="file" onChange={this.handleImage} accept="image/png, image/gif, image/jpeg" />
-        <img id="image" src={this.state.image}/>
-        {this.state.showImage && <p id='imageError'>Please upload image under 20mb</p>}
+        <input type="file" onChange={handleImage} accept="image/png, image/gif, image/jpeg" />
+        <img id="image" src={image}/>
+        {showImage && <p id='imageError'>Please upload image under 20mb</p>}
       </div>
     </tc>
 
@@ -151,26 +146,22 @@ class UploadPage extends React.Component {
       <div className="other_input">
         <h3>Species: </h3>
 
-        <input type="text" onChange={this.handleChange1}/>
-        {this.state.showSpecies && <p id='speciesError'>Please enter valid Species under 40 characters</p>}
+        <input type="text" onChange={handleChange1}/>
+        {showSpecies && <p id='speciesError'>Please enter valid Species under 40 characters</p>}
         <h3>Lat and Long: </h3>
-        <input type="text" ref={this.latRef} onChange={this.handleChange2} />
+        <input type="text" ref={latRef} onChange={handleChange2} />
 
-        <input type="text" ref={this.longRef} onChange={this.handleChange3}/>
-        {this.state.showLocation && <p id='locationError'>Please enter valid Location under 20 digits</p>}
+        <input type="text" ref={longRef} onChange={handleChange3}/>
+        {showLocation && <p id='locationError'>Please enter valid Location under 20 digits</p>}
         <h3></h3>
         <h2></h2>
-        <button onClick={this.handleLocation} className="post">Get Current Location</button>
-        <button onClick={this.handleSubmit} ref={this.button} className="post">POST</button>
+        <button onClick={handleLocation} className="post">Get Current Location</button>
+        <button onClick={handleSubmit} ref={button} className="post">POST</button>
       </div>
     </tc>
   </table>
-:
-<h2>Error: Not logged in</h2>
-    }
-    </div>
-    );
-  }
+  </div>
+  );
 }
 
 export default UploadPage;

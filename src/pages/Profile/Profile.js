@@ -1,4 +1,4 @@
-import React,{useState, getProfile, useEffect} from 'react'
+import React,{useState, useEffect} from 'react'
 import { getUsername } from '../../firebase/account';
 import { getPostsByUsername, getUserProfileStatistics} from '../../firebase/database';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -7,7 +7,6 @@ import commentbadge from './comment-dots-solid.svg';
 import likebadge from './medal-solid.svg';
 import identificationbadge from './magnifying-glass-solid.svg';
 import userProfile from './user-solid.svg';
-import { scryRenderedComponentsWithType } from 'react-dom/test-utils';
 
 const Profile = ()=>{
   let { userid } = useParams();
@@ -37,7 +36,7 @@ const Profile = ()=>{
         else {
           setUsername(userid)
         }
-  }, []);
+  }, [userid]);
 
   useEffect(() => {
         if(username !== null) {
@@ -54,21 +53,21 @@ const Profile = ()=>{
 
   function generateBadges() {
     let finalarr = [];
-    if(profile?.totalCommentRating > 2) {
-      finalarr.push(<img title="total comment rating" 
-      onMouseOver={()=>{setHoverText("Comment karma exceeds 3 votes")}} 
+    if(profile?.totalSpeciesIdentifications > 2) {
+      finalarr.push(<img title="total species identifications" 
+      onMouseOver={()=>{setHoverText("User exceeds 2 species guesses")}} 
       onMouseOut={()=>{setHoverText("")}}
-      alt="total comment rating" src={commentbadge}/>);
+      alt="total species identifications" src={commentbadge}/>);
     }
     if(profile?.totalPostRating > 2) {
       finalarr.push(<img title="total post rating" 
-      onMouseOver={()=>{setHoverText("Post karma exceeds 3 votes")}} 
+      onMouseOver={()=>{setHoverText("Post karma exceeds 2 votes")}} 
       onMouseOut={()=>{setHoverText("")}}
       alt="total post rating" src={likebadge}/>);
     }
     if(profile?.totalSpeciesIdentificationRating > 2) {
       finalarr.push(<img title="total species identification rating" 
-      onMouseOver={()=>{setHoverText("Species ID karma exceeds 3 votes")}} 
+      onMouseOver={()=>{setHoverText("Species ID karma exceeds 2 votes")}} 
       onMouseOut={()=>{setHoverText("")}}
       alt="total species identification rating" src={identificationbadge}/>);
     }

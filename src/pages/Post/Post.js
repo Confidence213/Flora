@@ -24,7 +24,6 @@ function Post () {
     
     async function getPost () {
         const m_post = await getPostById(postid);
-        console.log(m_post);
         if(m_post === undefined) {
             setPostFound(false);
             return;

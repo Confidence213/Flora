@@ -35,7 +35,6 @@ function Comments(props) {
  
     async function getList() {
         const m_list = await getCommentsByPost(props.postid);
-        console.log(Array.from(m_list.values()));
         if(m_list === undefined) {
             setList(null)
         }

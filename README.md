@@ -38,4 +38,7 @@ Password: `coolmod`
 ## Image Attributions
 
 Profile page icons: https://fontawesome.com/v4/license/
+
 Home page map graphic: https://freesvg.org/silhouette-vector-graphics-of-political-world-map
+
+Website favicon: https://favicon.io/favicon-generator/

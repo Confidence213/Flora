@@ -329,14 +329,18 @@ async function toggleIncrementPostRating(postId, postAuthor){
 
     if(repeatVoteCheck){
         currentUserVotedPosts.delete(postId);
-        await updateDoc(userRef,{
-            [path]: deleteField(),
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: deleteField(),
+            });
         });
     }
     else{
         currentUserVotedPosts.set(postId, true);
-        await updateDoc(userRef,{
-            [path]: true,
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: true,
+            });
         });
     }
     
@@ -377,14 +381,18 @@ async function toggleDecrementPostRating(postId, postAuthor){
 
     if(repeatVoteCheck){
         currentUserVotedPosts.delete(postId);
-        await updateDoc(userRef,{
-            [path]: deleteField(),
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: deleteField(),
+            });
         });
     }
     else{
         currentUserVotedPosts.set(postId, false);
-        await updateDoc(userRef,{
-            [path]: false,
+        await runTransaction(db, async (transaction) => {
+            transaction.update(userRef,{
+                [path]: false,
+            });
         });
     }
 

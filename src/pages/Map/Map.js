@@ -64,7 +64,8 @@ function Map () {
     [debouncedBounds] 
   );
 
-  // debounce custom hook
+  // adapted from usehooks-ts 
+  // https://usehooks-ts.com/react-hook/use-debounce
   function useDebounce(value, delay) {
     const [debouncedValue, setDebouncedValue] = useState(value);
 

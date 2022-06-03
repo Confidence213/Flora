@@ -589,9 +589,7 @@ async function toggleDecrementSpeciesIdentificationRating(postId, speciesIdentif
 }
 
 async function hasUserLikedPost(postId){
-    if(currentUserVotedPosts === undefined){
-        await getVotedPosts();
-    }
+    await getVotedPosts();
 
     if(currentUserVotedPosts.get(postId) === true){
         return true;
@@ -599,9 +597,7 @@ async function hasUserLikedPost(postId){
     return false;
 }
 async function hasUserDislikedPost(postId){
-    if(currentUserVotedPosts === undefined){
-        await getVotedPosts();
-    }
+    await getVotedPosts();
 
     if(currentUserVotedPosts.get(postId) === false){
         return true;
@@ -610,19 +606,14 @@ async function hasUserDislikedPost(postId){
 }
 
 async function hasUserLikedComment(postId, commentId){
-    if(currentUserVotedComments === undefined || votedCommentsPost !== postId){
-        await getVotedComments(postId);
-    }
+    await getVotedComments(postId);
     if(currentUserVotedComments.get(commentId) === true){
         return true;
     }
     return false;
 }
 async function hasUserDislikedComment(postId, commentId){
-    if(currentUserVotedComments === undefined || votedCommentsPost !== postId){
-        await getVotedComments(postId);
-    }
-
+    await getVotedComments(postId);
     if(currentUserVotedComments.get(commentId) === false){
         return true;
     }
@@ -630,18 +621,14 @@ async function hasUserDislikedComment(postId, commentId){
 }
 
 async function hasUserLikedSpeciesIdentification(postId, speciesIdentificationId){
-    if(currentUserVotedSpeciesIdentifications === undefined || votedSpeciesIdentificationsPost !== postId){
-        await getVotedSpeciesIdentifications(postId);
-    }
+    await getVotedSpeciesIdentifications(postId);
     if(currentUserVotedSpeciesIdentifications.get(speciesIdentificationId) === true){
         return true;
     }
     return false;
 }
 async function hasUserDislikedSpeciesIdentification(postId, speciesIdentificationId){
-    if(currentUserVotedSpeciesIdentifications === undefined || votedSpeciesIdentificationsPost !== postId){
-        await getVotedSpeciesIdentifications(postId);
-    }
+    await getVotedSpeciesIdentifications(postId);
     if(currentUserVotedSpeciesIdentifications.get(speciesIdentificationId) === false){
         return true;
     }
